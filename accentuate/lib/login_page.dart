@@ -1,5 +1,6 @@
 import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
+import 'package:accentuate/forgot_password_page.dart';
 import 'package:flutter/material.dart';
  class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -12,16 +13,17 @@ import 'package:flutter/material.dart';
 
   void goToForgotPassword(BuildContext context) {
     // temporary until forgot password page is created.
-    const snackbar = SnackBar(content: Text("Navigate to Forgot Password."));
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPassword()));
   }
 
   void signUserUp(BuildContext context) {
+    // temporary
     const snackbar = SnackBar(content: Text("Navigate to Sign up."));
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   void signUserInWithGoogle(BuildContext context) {
+    // temporary
     const snackbar = SnackBar(content: Text("Navigate to Google Sign in."));
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
