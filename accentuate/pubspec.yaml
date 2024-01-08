@@ -72,6 +72,15 @@ flutter:
      - images/8.jpg
      - images/9.jpg
      - images/story.png
+     - images/p1.jpg
+     - images/p2.jpg
+     - images/p3.jpg
+     - images/p4.jpg
+     - images/p5.jpg
+     - images/p6.jpg
+     - images/p7.jpg
+     - images/p8.jpg
+     - images/p9.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

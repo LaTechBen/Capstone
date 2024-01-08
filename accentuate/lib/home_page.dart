@@ -17,6 +17,17 @@ class _HomePageState extends State<HomePage> {
     "images/8.jpg",
     "images/9.jpg",
   ];
+  List<String> posts = [
+    "images/p1.jpg",
+    "images/p2.jpg",
+    "images/p3.jpg",
+    "images/p4.jpg",
+    "images/p5.jpg",
+    "images/p6.jpg",
+    "images/p7.jpg",
+    "images/p8.jpg",
+    "images/p9.jpg",
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,6 +74,7 @@ class _HomePageState extends State<HomePage> {
                                 profileImages[index],
                               )),
                         ),
+                        SizedBox(height: 10),
                         Text(
                           "Profile Name",
                           style: TextStyle(fontSize: 12, color: Colors.black87),
@@ -71,9 +83,62 @@ class _HomePageState extends State<HomePage> {
                     )),
               ),
             ),
-          )
-          //Divider(),
-          //Here
+          ),
+          Divider(),
+          Column(
+            children: List.generate(
+              8,
+              (index) => Column(
+                children: [
+                  //Header post
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        child: CircleAvatar(
+                          radius: 14,
+                          backgroundImage: AssetImage(
+                            "images/story.png",
+                          ),
+                          child: CircleAvatar(
+                            radius: 12,
+                            backgroundImage: AssetImage(
+                              profileImages[index],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Text("Profile Name"),
+                      Spacer(),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.more_vert),
+                      )
+                    ],
+                  ),
+                  // Image Post
+                  Image.asset(posts[index]),
+                  // Footer Post
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.favorite_border),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.favorite_border),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.favorite_border),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
         ]),
       ),
     );
