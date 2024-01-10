@@ -1,3 +1,4 @@
+import 'package:accentuate/login_page.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 
@@ -23,9 +24,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
         useMaterial3: true,
       ),
-      home: MyHomePage(
-        title: "",
-      ),
+
+      //home: MyHomePage(title: "",),
+
+      home: LoginPage()
+
     );
   }
 }
