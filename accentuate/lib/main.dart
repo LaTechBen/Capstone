@@ -1,8 +1,10 @@
+import 'package:accentuate/firebase_options.dart';
 import 'package:accentuate/login_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
-
-void main() {
+void main() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 

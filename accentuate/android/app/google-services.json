@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "116021754934",
+    "project_id": "accentuate-3be42",
+    "storage_bucket": "accentuate-3be42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:116021754934:android:d726da593dfd2792d4ac97",
+        "android_client_info": {
+          "package_name": "com.example.accentuate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA92WqJkQNwjJHGUR02LwWHfZBA_gGYqkQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
