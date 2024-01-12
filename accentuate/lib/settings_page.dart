@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'personalinfo_page.dart';
+import 'accountinfo_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,57 +41,71 @@ class SettingsPage extends StatelessWidget {
           ],
         ),
       ),
-      body: const SettingsList(),
+      body: const SettingsBody(),
     );
   }
 }
 
-// Displays the Email, Phone, Username, and Password text fields using ListView
-class SettingsList extends StatelessWidget {
-  const SettingsList({Key? key}) : super(key: key);
+class SettingsBody extends StatelessWidget {
+  const SettingsBody({Key? key}) : super(key: key);
 
   @override 
   Widget build(BuildContext context) {
-    return ListView(
+    return Padding(
       padding: const EdgeInsets.all(16.0),
-      children: <Widget>[
-        _buildTextFieldWithButton('Email'),
-        _buildTextFieldWithButton('Phone'),
-        _buildTextFieldWithButton('Username'),
-        _buildTextFieldWithButton('Password'),
-      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SettingsButton(icon: Icons.person, text: 'Account Information'),
+          const SizedBox(height: 16),
+          SettingsButton(icon: Icons.credit_card, text: 'Personal Information'),
+        ],
+      ),
     );
   }
 }
 
-// Helper Method to build the view. 
-// Includes a 'change' button  
-Widget _buildTextFieldWithButton(String label) {
-  return Column( 
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      const SizedBox(height: 12),
-      Text(
-        label, 
-        style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        TextField( 
-          decoration: InputDecoration(
-            hintText: 'Enter $label',
-            border: const OutlineInputBorder()
-          ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              // IMPLEMENT 'CHANGE' BUTTON FUNCTION HERE
-            },
-            child: const Text('Change'),
-          ),
-        ),
-    ],
-  );
-}
+class SettingsButton extends StatelessWidget {
+  final IconData icon;
+  final String text;
 
+  SettingsButton({required this.icon, required this.text});
+    
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        // Button Logic here
+        if (text == 'Account Information') {
+            Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => const AccountInfoPage()),
+          );
+        } else if (text == 'Personal Information') {
+            Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => const PersonalInfoPage()),
+          );
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(icon),
+            Text(
+              text,
+              style: const TextStyle(fontSize: 18),
+            ),
+            Opacity(opacity: 0, child: Icon(icon)), 
+          ],
+        ),
+      ),
+    );
+  }
+}
