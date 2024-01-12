@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'personalinfo_page.dart';
 import 'accountinfo_page.dart';
+import 'home_page.dart';
 
-void main() {
+/*void main() {
   runApp(const MyApp());
-}
+}*/
 
 // Initializes and runs the app
 // Will change this to be integrated with main.dart
 // For now It is used to only run the 'settings_page.dart' for testing purposes
-class MyApp extends StatelessWidget {
+/*class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
@@ -20,21 +21,21 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.pink,
       ),
       home: const SettingsPage(),
-      );
+    );
   }
-}
+}*/
 
 // Settings Screen UI, displays the SettingsList
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
-  @override 
+  @override
   Widget build(BuildContext context) {
-    return Scaffold( 
+    return Scaffold(
       appBar: AppBar(
         title: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:[
+          children: [
             Text('Settings'),
             SizedBox(width: 8),
             Icon(Icons.settings),
@@ -49,7 +50,7 @@ class SettingsPage extends StatelessWidget {
 class SettingsBody extends StatelessWidget {
   const SettingsBody({Key? key}) : super(key: key);
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
