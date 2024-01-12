@@ -127,11 +127,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.favorite_border),
+                        icon: Icon(Icons.comment_rounded),
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.favorite_border),
+                        icon: Icon(Icons.share_rounded),
                       ),
                     ],
                   )

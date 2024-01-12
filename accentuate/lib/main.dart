@@ -1,6 +1,8 @@
 import 'package:accentuate/login_page.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'createaccount.dart';
+import 'settings_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,24 +15,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Accentuate',
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          elevation: 1,
-          color: Colors.white,
+        debugShowCheckedModeBanner: false,
+        title: 'Accentuate',
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(
+            elevation: 1,
+            color: Colors.white,
+            iconTheme: IconThemeData(color: Colors.pink),
+          ),
           iconTheme: IconThemeData(color: Colors.pink),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
+          useMaterial3: true,
         ),
-        iconTheme: IconThemeData(color: Colors.pink),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
-        useMaterial3: true,
-      ),
+        home: MyHomePage(
+          title: "",
+        )
 
-      //home: MyHomePage(title: "",),
+        //home: LoginPage()
 
-      home: LoginPage()
-
-    );
+        //home: SettingsList()
+        //home: CreateAccount()
+        );
   }
 }
 
@@ -149,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             onPressed: () {},
             icon: const Icon(
-              Icons.card_travel,
+              Icons.settings_applications_outlined,
             ),
           ),
           const Spacer(),
