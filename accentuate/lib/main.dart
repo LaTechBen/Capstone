@@ -3,6 +3,8 @@ import 'package:accentuate/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'createaccount.dart';
+import 'settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,11 +31,11 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
-        // home: MyHomePage(
-        //   title: "",
-        // )
+        home: MyHomePage(
+          title: "",
+        )
 
-        home: LoginPage()
+        //home: LoginPage()
 
         //home: SettingsList()
         //home: CreateAccount()
@@ -156,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             onPressed: () {},
             icon: const Icon(
-              Icons.card_travel,
+              Icons.settings_applications_outlined,
             ),
           ),
           const Spacer(),

@@ -2,7 +2,9 @@ import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
 import 'package:accentuate/forgot_password_page.dart';
 import 'package:flutter/material.dart';
- class LoginPage extends StatelessWidget {
+import 'home_page.dart';
+
+class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   final emailController = TextEditingController();
@@ -13,7 +15,8 @@ import 'package:flutter/material.dart';
 
   void goToForgotPassword(BuildContext context) {
     // temporary until forgot password page is created.
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPassword()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ForgotPassword()));
   }
 
   void signUserUp(BuildContext context) {
@@ -31,118 +34,110 @@ import 'package:flutter/material.dart';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.pink[100],
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 50),
+        backgroundColor: Colors.pink[100],
+        body: SafeArea(
+            child: Center(
+                child: Column(
+          children: [
+            const SizedBox(height: 50),
 
-              // Logo
-              Image.asset('images/logo.png'),
+            // Logo
+            Image.asset('images/logo.png'),
 
-              // padding
-              const SizedBox(height: 25),
+            // padding
+            const SizedBox(height: 25),
 
-              // email input
-              MyTextField(
-                controller: emailController,
-                hintText: 'Email',
-                obscureText: false,
-              ),
+            // email input
+            MyTextField(
+              controller: emailController,
+              hintText: 'Email',
+              obscureText: false,
+            ),
 
-              // spacing
-              const SizedBox(height: 25),
+            // spacing
+            const SizedBox(height: 25),
 
-              // password input
-              MyTextField(
-                controller: passwordController,
-                hintText: 'Password',
-                obscureText: true,
-              ),
+            // password input
+            MyTextField(
+              controller: passwordController,
+              hintText: 'Password',
+              obscureText: true,
+            ),
 
-              // padding
-              const SizedBox(height: 5),
+            // padding
+            const SizedBox(height: 5),
 
-              // forgot password
-              GestureDetector(
-                onTap: () => goToForgotPassword(context),
-                child: const Padding(padding: EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.black, fontSize: 14),
-                    )
-                  ],
-                )),
-              ),
+            // forgot password
+            GestureDetector(
+              onTap: () => goToForgotPassword(context),
+              child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Forgot Password?',
+                        style: TextStyle(color: Colors.black, fontSize: 14),
+                      )
+                    ],
+                  )),
+            ),
 
-              const SizedBox(height: 25),
+            const SizedBox(height: 25),
 
-              MyButton(text: "Sign In", onTap: signUserIn),
+            MyButton(text: "Sign In", onTap: signUserIn),
 
-              const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.black,
-                      ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      thickness: 0.5,
+                      color: Colors.black,
                     ),
-                    Padding(
+                  ),
+                  Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.0),
                       child: Text(
                         'Continue with',
                         style: TextStyle(color: Colors.black),
-                        )),
-                    Expanded(
+                      )),
+                  Expanded(
                       child: Divider(
-                      thickness: 0.5,
-                      color: Colors.black,
-                    ))
-                  ],
-                ),
+                    thickness: 0.5,
+                    color: Colors.black,
+                  ))
+                ],
               ),
+            ),
 
-              const SizedBox(height: 25),
+            const SizedBox(height: 25),
 
-              GestureDetector(
+            GestureDetector(
                 onTap: () => signUserInWithGoogle(context),
-                child: Image.asset('images/android_neutral_rd_na@2x.png')
-              ),
+                child: Image.asset('images/android_neutral_rd_na@2x.png')),
 
-              const SizedBox(height: 25),
+            const SizedBox(height: 25),
 
-              GestureDetector(
+            GestureDetector(
                 onTap: () => signUserUp(context),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                    "Need an account?",
-                    style: TextStyle(color: Colors.black, fontSize: 16)
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    "Sign up.",
-                    style: TextStyle(color: Colors.blue, fontSize: 16, fontWeight: FontWeight.bold)
-                  )
+                    Text("Need an account?",
+                        style: TextStyle(color: Colors.black, fontSize: 16)),
+                    SizedBox(width: 4),
+                    Text("Sign up.",
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold))
                   ],
-                  
-                )
-              ),
-
-            ],
-          )
-        )
-
-      )
-    );
+                )),
+          ],
+        ))));
   }
 }
