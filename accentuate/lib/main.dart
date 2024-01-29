@@ -1,10 +1,12 @@
 import 'package:accentuate/firebase_options.dart';
 import 'package:accentuate/login_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'createaccount.dart';
 import 'settings_page.dart';
+import 'read.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,24 +24,53 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Accentuate',
         theme: ThemeData(
-          appBarTheme: AppBarTheme(
+          appBarTheme: const AppBarTheme(
             elevation: 1,
             color: Colors.white,
             iconTheme: IconThemeData(color: Colors.pink),
           ),
-          iconTheme: IconThemeData(color: Colors.pink),
+          iconTheme: const IconThemeData(color: Colors.pink),
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
-        home: MyHomePage(
-          title: "",
-        )
+        home: const Test(
+            // title: "",
+            )
 
         //home: LoginPage()
 
         //home: SettingsList()
         //home: CreateAccount()
         );
+  }
+}
+
+class Test extends StatelessWidget {
+  const Test({super.key});
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          return ListView(
+            children: snapshot.data!.docs.map((document) {
+              return Container(
+                child: Center(child: Text(document['username'])),
+              );
+            }).toList(),
+          );
+        },
+      ),
+    );
   }
 }
 
