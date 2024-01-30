@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
     "images/p9.jpg",
   ];
 
+
   // Map to store like counts for each post index
   Map<int, int> likeCounts = {
     1: 0,
@@ -320,6 +321,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             "View all 12 comments",
                             style: TextStyle(color: Colors.black38),
+
                           )
                         ],
                       ),
