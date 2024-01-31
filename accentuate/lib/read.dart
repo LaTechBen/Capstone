@@ -1,26 +1,27 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
+// class ReadData extends StatelessWidget {
+//   const ReadData({super.key});
 
+//   Widget readData(BuildContext context, String id, String tableName) {
+//     return StreamBuilder(
+//       stream: FirebaseFirestore.instance.collection(tableName).snapshots(),
+//       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+//         if (!snapshot.hasData) {
+//           return const Center(
+//             child: CircularProgressIndicator(),
+//           );
+//         }
 
-// fetchRecords(String id, String collectionName) async {
-//   var records = await FirebaseFirestore.instance.collection(collectionName).doc(id).get();
-//   switch(collectionName)
-//   {
-//     case 'users':
-//       return mapUserRecords(records);
-    
+//         return ListView(
+//           children: snapshot.data!.docs.map((document) {
+//             return Container(
+//               child: Center(child: Text(document['username'])),
+//             );
+//           }).toList(),
+//         );
+//       },
+//     );
 //   }
-// }
-
-
-
-// mapUserRecords(QuerySnapshot<Map<String, dynamic>> records) {
-//   records.docs.map(
-//     (item) => Item(
-//         id: item.id,
-//         email: item['email'],
-//         password: item['password'],
-//         username: item['username']),
-//   );
 // }

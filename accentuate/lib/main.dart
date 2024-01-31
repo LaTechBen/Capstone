@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
-        home: const Test(
-            // title: "",
+        home: const MyHomePage(
+            title: "",
             )
 
         //home: LoginPage()
@@ -45,34 +45,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Test extends StatelessWidget {
-  const Test({super.key});
 
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          return ListView(
-            children: snapshot.data!.docs.map((document) {
-              return Container(
-                child: Center(child: Text(document['username'])),
-              );
-            }).toList(),
-          );
-        },
-      ),
-    );
-  }
-}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
