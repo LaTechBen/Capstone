@@ -1,18 +1,50 @@
+import 'dart:developer';
+
+import 'package:accentuate/accountinfo_page.dart';
+import 'package:accentuate/authentication/firebase_auth_service.dart';
 import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
 import 'package:accentuate/createaccount.dart';
 import 'package:accentuate/forgot_password_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   LoginPage({super.key});
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
 
+class _LoginPageState extends State<LoginPage> {
+
+  final FirebaseAuthService  _auth = FirebaseAuthService();
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+@override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
   // todo request to firebase
-  void signUserIn() {}
+  void signUserIn() async {
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.loginWithEmailAndPassword(email, password);
+
+    if(user==null){
+      const snackbar = SnackBar(content: Text("Invalid Email or Password."));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return null;
+    }
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
+  }
 
   void goToForgotPassword(BuildContext context) {
     // temporary until forgot password page is created.
@@ -32,6 +64,7 @@ class LoginPage extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +83,7 @@ class LoginPage extends StatelessWidget {
 
             // email input
             MyTextField(
-              controller: emailController,
+              controller: _emailController,
               hintText: 'Email',
               obscureText: false,
             ),
@@ -60,7 +93,7 @@ class LoginPage extends StatelessWidget {
 
             // password input
             MyTextField(
-              controller: passwordController,
+              controller: _passwordController,
               hintText: 'Password',
               obscureText: true,
             ),
