@@ -4,6 +4,7 @@ import 'package:accentuate/accountinfo_page.dart';
 import 'package:accentuate/authentication/firebase_auth_service.dart';
 import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
+import 'package:accentuate/createaccount.dart';
 import 'package:accentuate/forgot_password_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -53,8 +54,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void signUserUp(BuildContext context) {
     // temporary
-    const snackbar = SnackBar(content: Text("Navigate to Sign up."));
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => CreateAccount()));
   }
 
   void signUserInWithGoogle(BuildContext context) {
