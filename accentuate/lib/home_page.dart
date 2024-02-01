@@ -29,6 +29,68 @@ class _HomePageState extends State<HomePage> {
     "images/p9.jpg",
   ];
 
+
+  // Map to store like counts for each post index
+  Map<int, int> likeCounts = {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0,
+    8: 0,
+    9: 0,
+  };
+
+  // Map to store comments for each post index
+  Map<int, List<String>> commentsMap = {
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+    7: [],
+    8: [],
+    9: [],
+  };
+
+  TextEditingController commentController = TextEditingController();
+
+  // Maintain a list to keep track of the pressed state for each posts
+  List<bool> isLiked = List.filled(9, false);
+
+  // Method to handle like button press
+  void handleLikeButtonPress(int index) {
+    setState(() {
+      // Toggle the state of the icon when it's pressed
+      isLiked[index] = !isLiked[index];
+      // Initialize the like count if it's null
+      likeCounts[index] ??= 0;
+      // Increment like count for the specified post index if it's liked
+      if (isLiked[index]) {
+        // Increment like count for the specified post index
+        likeCounts[index] = likeCounts[index]! + 1;
+      } else {
+        likeCounts[index] = likeCounts[index]! - 1;
+      }
+    });
+  }
+
+  // Method to handle adding a comment
+  void handleCommentButtonPress(int index) {
+    setState(() {
+      String comment = commentController.text;
+      if (comment.isNotEmpty) {
+        // Ensure commentsMap[index] is not null before adding the comment
+        commentsMap[index] ??= [];
+        commentsMap[index]!.add(comment);
+        commentController.clear();
+      }
+    });
+  }
+
   Future<void> onRefresh() async {
     await Future.delayed(Duration(seconds: 1));
   }
@@ -131,11 +193,51 @@ class _HomePageState extends State<HomePage> {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.favorite_border),
+                          onPressed: () {
+                            handleLikeButtonPress(index);
+                          },
+                          icon: Icon(
+                            isLiked[index]
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            // Update the color based on the isLiked state
+                            color: isLiked[index] ? Colors.red : null,
+                          ),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Open a dialog to add a comment
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Add Comment'),
+                                  content: TextField(
+                                    controller: commentController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter your comment',
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        // Handle adding a comment
+                                        handleCommentButtonPress(index);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Add'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                           icon: Icon(Icons.comment_rounded),
                         ),
                         IconButton(
@@ -144,6 +246,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
+
                     Container(
                       padding: EdgeInsets.all(15),
                       child: Column(
@@ -160,9 +263,13 @@ class _HomePageState extends State<HomePage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  TextSpan(text: " and"),
                                   TextSpan(
-                                    text: " others",
+                                    text: likeCounts[index] == 0 ? " " : " and",
+                                  ),
+                                  TextSpan(
+                                    text: likeCounts[index] == 0
+                                        ? " "
+                                        : " ${likeCounts[index]} others",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -179,16 +286,42 @@ class _HomePageState extends State<HomePage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  TextSpan(
-                                    text: " This is the most amazing fit",
-                                  ),
+                                  TextSpan(text: " This is an amazing fit"),
                                 ]),
                           ),
+                          // Display comments with user name in bold and comment in normal text
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: (commentsMap[index] ?? [])
+                                .map((comment) => Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 4),
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: DefaultTextStyle.of(context)
+                                              .style,
+                                          children: [
+                                            TextSpan(
+                                              text:
+                                                  'Profile name', // Assuming "Profile name" is the user name
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                                text:
+                                                    ' '), // Add space between user name and comment
+                                            TextSpan(text: comment),
+                                          ],
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+
                           Text(
                             "View all 12 comments",
-                            style: TextStyle(
-                              color: Colors.black38,
-                            ),
+                            style: TextStyle(color: Colors.black38),
+
                           )
                         ],
                       ),

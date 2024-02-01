@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'createaccount.dart';
 import 'settings_page.dart';
+import 'search_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,9 +37,10 @@ class MyApp extends StatelessWidget {
         // )
 
         home: LoginPage()
-
         //home: SettingsList()
         // home: CreateAccount()
+        // home: SettingsPage()
+        //home: CreateAccount()
         );
   }
 }
@@ -62,19 +64,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+  int currentPage = 0;
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -84,7 +74,11 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      body: HomePage(),
+      body: currentPage == 2
+          ? SettingsPage()
+          : currentPage == 1
+              ? SearchPage()
+              : HomePage(),
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
@@ -125,24 +119,28 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       **/
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+
       bottomNavigationBar: BottomAppBar(
           child: Row(
         children: [
           const Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                currentPage = 0;
+              });
+            },
             icon: const Icon(
               Icons.home,
             ),
           ),
           const Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                currentPage = 1;
+              });
+            },
             icon: const Icon(
               Icons.search,
             ),
@@ -156,7 +154,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           const Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                currentPage = 2;
+              });
+            },
             icon: const Icon(
               Icons.settings_applications_outlined,
             ),
