@@ -1,22 +1,45 @@
+import 'package:accentuate/authentication/firebase_auth_service.dart';
+import 'package:accentuate/login_page.dart';
 import 'package:flutter/material.dart';
 
 import 'components/my_button.dart';
 import 'components/my_textfield.dart';
 
-class ForgotPassword extends StatelessWidget {
+class ForgotPassword extends StatefulWidget {
   ForgotPassword({super.key});
 
-  final emailController = TextEditingController();
+  @override
+  State<ForgotPassword> createState() => _ForgotPasswordState();
+}
 
-  void submitForgotPassword(BuildContext context) {
+class _ForgotPasswordState extends State<ForgotPassword> {
+  final _emailController = TextEditingController();
+
+  final FirebaseAuthService  _auth = FirebaseAuthService();
+
+  void submitForgotPassword(BuildContext context) async {
     // temporary
-    const snackbar = SnackBar(content: Text("Send forgot password email."));
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    String email = _emailController.text;
+    try{
+      await _auth.forgotPassword(email: email);
+        const snackbar = SnackBar(content: Text("Please check your email to reset your password"));
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } catch (e) {
+        const snackbar = SnackBar(content: Text("There was an error in sending the forgot password email."));
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
+
+  }
+
+  void goToLoginPage(BuildContext context){
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.pink[100],
       body: SafeArea(
         child: Center(
@@ -25,16 +48,35 @@ class ForgotPassword extends StatelessWidget {
               const SizedBox(height: 50),
 
               // Logo
-              Image.asset('images/logo.png'),
+              Image.asset('images/newLogo.png'),
 
               // padding
               const SizedBox(height: 25),
 
               // email input
               MyTextField(
-                controller: emailController,
+                controller: _emailController,
                 hintText: 'Email',
                 obscureText: false,
+              ),
+
+              // padding
+              const SizedBox(height: 5),
+
+              // button to login page
+              GestureDetector(
+                onTap: () => goToLoginPage(context),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Login Page',
+                        style: TextStyle(color: Colors.black, fontSize: 14),
+                      )
+                    ],
+                  )),
               ),
 
               // padding

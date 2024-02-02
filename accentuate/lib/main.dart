@@ -32,14 +32,13 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
-        home: MyHomePage(
-          title: "",
-        )
+        // home: MyHomePage(
+        //   title: "",
+        // )
 
-        //home: LoginPage()
-
-        // home: SettingsPage()
-        //home: CreateAccount()
+        home: LoginPage()
+        // home: CreateAccount()
+       // home: SettingsPage()
         );
   }
 }
