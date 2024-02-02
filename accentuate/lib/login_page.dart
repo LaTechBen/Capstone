@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:accentuate/accountinfo_page.dart';
 import 'package:accentuate/authentication/firebase_auth_service.dart';
 import 'package:accentuate/components/my_button.dart';
@@ -35,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    User? user = await _auth.loginWithEmailAndPassword(email, password);
+    User? user = await _auth.signInWithEmailAndPassword(email, password);
 
     if(user==null){
       const snackbar = SnackBar(content: Text("Invalid Email or Password."));
@@ -43,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
       return null;
     }
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
   }
 
   void goToForgotPassword(BuildContext context) {
@@ -68,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
         backgroundColor: Colors.pink[100],
         body: SafeArea(
             child: Center(
