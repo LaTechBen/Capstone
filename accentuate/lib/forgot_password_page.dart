@@ -48,7 +48,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               const SizedBox(height: 50),
 
               // Logo
-              Image.asset('images/logo.png'),
+              Image.asset('images/newLogo.png'),
 
               // padding
               const SizedBox(height: 25),
