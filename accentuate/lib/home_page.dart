@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'dart:html' as html;
+import 'dart:typed_data';
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   @override
@@ -49,6 +52,53 @@ class _HomePageState extends State<HomePage> {
         print('Image picked from "images" folder: ${image.path}');
       }
     }
+  }
+
+  // Method to handle picking an image from the "images" folder
+  Future<void> _pickImageFromImagesFolderWeb() async {
+    final html.FileUploadInputElement input = html.FileUploadInputElement();
+    input.accept = 'image/*';
+    input.click();
+
+    // Wait for the user to select files (asynchronous)
+    await input.onChange.first;
+
+    // Access the selected files
+    final files = input.files;
+    if (files!.isNotEmpty) {
+      final selectedFile = files[0];
+      final reader = html.FileReader();
+
+      reader.onLoadEnd.listen((html.ProgressEvent event) {
+        final html.FileReader reader = event.target as html.FileReader;
+        if (reader.readyState == html.FileReader.DONE) {
+          final Uint8List? imageData = reader.result as Uint8List?;
+          if (imageData != null) {
+            // Open the selected image file in a new tab
+            _openImageInNewTab(imageData);
+          } else {
+            print('Failed to read image data');
+          }
+        }
+      });
+
+      reader.readAsArrayBuffer(selectedFile);
+    }
+  }
+
+// Function to open the image in a new tab
+  void _openImageInNewTab(Uint8List imageData) {
+    // Convert the image data to a base64-encoded string
+    final base64Image = base64Encode(imageData);
+
+    // Determine the image format based on the image data
+    final imageType = 'image/png'; // Update this based on your image format
+
+    // Construct the data URL with the base64-encoded image data and image type
+    final dataUrl = 'data:$imageType;base64,$base64Image';
+
+    // Open a new tab with the data URL
+    html.window.open(dataUrl, '_blank');
   }
 
   List<String> profileImages = [
@@ -154,7 +204,7 @@ class _HomePageState extends State<HomePage> {
               // _pickImageFromGallery();
 
               // Call the method to pick an image from the "images" folder
-              _pickImageFromImagesFolder();
+              _pickImageFromImagesFolderWeb();
             },
             icon: Icon(Icons.add_circle_outline),
           ),
