@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'components/user_id.dart';
 import 'components/post_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -13,18 +14,6 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   final imagePath = getStorage() + "/" + getID();
-
-  // Stream<ListResult> listAllPaginated(Reference storageRef) async* {
-  //   String? pageToken;
-  //   do {
-  //     final listResult = await storageRef.list(ListOptions(
-  //       maxResults: 4,
-  //       pageToken: pageToken,
-  //     ));
-  //     yield listResult;
-  //     pageToken = listResult.nextPageToken;
-  //   } while (pageToken != null);
-  // }
 
   @override
   Widget build(BuildContext context) {
