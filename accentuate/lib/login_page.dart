@@ -5,6 +5,7 @@ import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
 import 'package:accentuate/createaccount.dart';
 import 'package:accentuate/forgot_password_page.dart';
+import 'package:accentuate/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
@@ -42,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       return null;
     }
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage( title: "")));
   }
 
   void goToForgotPassword(BuildContext context) {
