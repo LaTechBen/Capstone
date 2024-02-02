@@ -1,10 +1,4 @@
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'dart:html' as html;
-import 'dart:typed_data';
-import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,95 +6,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Add an instance of ImagePicker
-  final ImagePicker _picker = ImagePicker();
-
-  // Method to handle picking an image from the gallery
-  Future<void> _pickImageFromGallery() async {
-    final XFile? pickedImage =
-        await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      // Do something with the picked image, like uploading it
-      // For now, it prints the path to the console
-      print('Image picked from gallery: ${pickedImage.path}');
-    }
-  }
-
-  // Method to handle picking an image from the "images" folder
-  Future<void> _pickImageFromImagesFolder() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowedExtensions: ['jpg', 'jpeg', 'png'],
-      allowMultiple: false,
-    );
-
-    if (result != null) {
-      List<PlatformFile> files = result.files;
-      List<PlatformFile> imagesFromImagesFolder = [];
-
-      // Filter files from the "images" folder
-      for (var file in files) {
-        if (file.path!.contains('images')) {
-          // Adjust this condition based on your folder structure
-          imagesFromImagesFolder.add(file);
-        }
-      }
-
-      // Do something with the filtered images
-      // For now, you can just print the paths to the console
-      for (var image in imagesFromImagesFolder) {
-        print('Image picked from "images" folder: ${image.path}');
-      }
-    }
-  }
-
-  // Method to handle picking an image from the "images" folder
-  Future<void> _pickImageFromImagesFolderWeb() async {
-    final html.FileUploadInputElement input = html.FileUploadInputElement();
-    input.accept = 'image/*';
-    input.click();
-
-    // Wait for the user to select files (asynchronous)
-    await input.onChange.first;
-
-    // Access the selected files
-    final files = input.files;
-    if (files!.isNotEmpty) {
-      final selectedFile = files[0];
-      final reader = html.FileReader();
-
-      reader.onLoadEnd.listen((html.ProgressEvent event) {
-        final html.FileReader reader = event.target as html.FileReader;
-        if (reader.readyState == html.FileReader.DONE) {
-          final Uint8List? imageData = reader.result as Uint8List?;
-          if (imageData != null) {
-            // Open the selected image file in a new tab
-            _openImageInNewTab(imageData);
-          } else {
-            print('Failed to read image data');
-          }
-        }
-      });
-
-      reader.readAsArrayBuffer(selectedFile);
-    }
-  }
-
-// Function to open the image in a new tab
-  void _openImageInNewTab(Uint8List imageData) {
-    // Convert the image data to a base64-encoded string
-    final base64Image = base64Encode(imageData);
-
-    // Determine the image format based on the image data
-    final imageType = 'image/png'; // Update this based on your image format
-
-    // Construct the data URL with the base64-encoded image data and image type
-    final dataUrl = 'data:$imageType;base64,$base64Image';
-
-    // Open a new tab with the data URL
-    html.window.open(dataUrl, '_blank');
-  }
-
   List<String> profileImages = [
     "images/1.jpg",
     "images/2.jpg",
@@ -123,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     "images/p8.jpg",
     "images/p9.jpg",
   ];
+
 
   // Map to store like counts for each post index
   Map<int, int> likeCounts = {
@@ -199,13 +105,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              // Call the method to pick an image from the gallery
-              // _pickImageFromGallery();
-
-              // Call the method to pick an image from the "images" folder
-              _pickImageFromImagesFolderWeb();
-            },
+            onPressed: () {},
             icon: Icon(Icons.add_circle_outline),
           ),
           IconButton(
@@ -421,6 +321,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             "View all 12 comments",
                             style: TextStyle(color: Colors.black38),
+
                           )
                         ],
                       ),
