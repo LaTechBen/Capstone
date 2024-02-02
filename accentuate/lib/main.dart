@@ -37,10 +37,8 @@ class MyApp extends StatelessWidget {
         // )
 
         home: LoginPage()
-        //home: SettingsList()
         // home: CreateAccount()
-        // home: SettingsPage()
-        //home: CreateAccount()
+       // home: SettingsPage()
         );
   }
 }
