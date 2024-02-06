@@ -3,23 +3,25 @@ import 'package:accentuate/accountinfo_page.dart';
 import 'package:accentuate/authentication/firebase_auth_service.dart';
 import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
-import 'package:accentuate/createaccount.dart';
+import 'package:accentuate/signup_page.dart';
 import 'package:accentuate/forgot_password_page.dart';
 import 'package:accentuate/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 
-class LoginPage extends StatefulWidget {
-  LoginPage({super.key});
+class SigninPage extends StatefulWidget {
+  SigninPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SigninPage> createState() => _SigninPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SigninPageState extends State<SigninPage> {
 
   final FirebaseAuthService  _auth = FirebaseAuthService();
+  final FirebaseAuth _user = FirebaseAuth.instance;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -34,7 +36,12 @@ class _LoginPageState extends State<LoginPage> {
   void signUserIn() async {
     String email = _emailController.text;
     String password = _passwordController.text;
-
+    await _user.currentUser?.reload();
+    if(!_user.currentUser!.emailVerified){
+      const snackbar = SnackBar(content: Text("Please verify your email before signing in."));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return null;
+    }
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
     if(user==null){
@@ -52,10 +59,10 @@ class _LoginPageState extends State<LoginPage> {
         context, MaterialPageRoute(builder: (context) => ForgotPassword()));
   }
 
-  void signUserUp(BuildContext context) {
+  void goToSignUp(BuildContext context) {
     // temporary
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => CreateAccount()));
+        context, MaterialPageRoute(builder: (context) => SignupPage()));
   }
 
   void signUserInWithGoogle(BuildContext context) {
@@ -75,13 +82,13 @@ class _LoginPageState extends State<LoginPage> {
               child: Center(
                   child: Column(
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(height: 10),
           
               // Logo
-              Image.asset('images/logo.png'),
+              Image.asset('images/newLogo.png'),
           
               // padding
-              const SizedBox(height: 25),
+              const SizedBox(height: 10),
           
               // email input
               MyTextField(
@@ -91,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
           
               // spacing
-              const SizedBox(height: 25),
+              const SizedBox(height: 20),
           
               // password input
               MyTextField(
@@ -159,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 25),
           
               GestureDetector(
-                  onTap: () => signUserUp(context),
+                  onTap: () => goToSignUp(context),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

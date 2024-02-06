@@ -1,9 +1,9 @@
 import 'package:accentuate/firebase_options.dart';
-import 'package:accentuate/login_page.dart';
+import 'package:accentuate/signin_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
-import 'createaccount.dart';
+import 'signup_page.dart';
 import 'settings_page.dart';
 import 'search_page.dart';
 
@@ -36,8 +36,7 @@ class MyApp extends StatelessWidget {
         //  title: "",
         //  )
 
-        home: LoginPage()
-        // home: CreateAccount()
+        home: SigninPage()
        // home: SettingsPage()
         );
   }
