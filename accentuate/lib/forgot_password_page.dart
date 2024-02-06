@@ -1,5 +1,5 @@
 import 'package:accentuate/authentication/firebase_auth_service.dart';
-import 'package:accentuate/login_page.dart';
+import 'package:accentuate/signin_page.dart';
 import 'package:flutter/material.dart';
 
 import 'components/my_button.dart';
@@ -33,7 +33,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   void goToLoginPage(BuildContext context){
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LoginPage()));
+        context, MaterialPageRoute(builder: (context) => SigninPage()));
   }
 
   @override
