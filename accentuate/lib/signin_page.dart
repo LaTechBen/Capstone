@@ -36,16 +36,16 @@ class _SigninPageState extends State<SigninPage> {
   void signUserIn() async {
     String email = _emailController.text;
     String password = _passwordController.text;
-    await _user.currentUser?.reload();
-    if(!_user.currentUser!.emailVerified){
-      const snackbar = SnackBar(content: Text("Please verify your email before signing in."));
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-      return null;
-    }
+    //await _user.currentUser?.reload();
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
     if(user==null){
       const snackbar = SnackBar(content: Text("Invalid Email or Password."));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return null;
+    }
+      if(!user!.emailVerified){
+      const snackbar = SnackBar(content: Text("Please verify your email before signing in."));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
       return null;
     }
