@@ -47,7 +47,14 @@ class AccountInfoPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-      ),
+        actions: [
+        IconButton(
+          icon: const Icon(Icons.check),
+          // Insert Confirm Page Logic Here
+          onPressed: () {},
+        ),
+      ],
+    ),
       body: Center (
         child: Column( 
           mainAxisAlignment: MainAxisAlignment.center,

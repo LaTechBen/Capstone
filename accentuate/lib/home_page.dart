@@ -1,3 +1,4 @@
+import 'package:accentuate/createoutfit_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -105,16 +106,20 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.add_circle_outline),
+            onPressed: () {Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => const CreateOutfitPage()),
+            );
+          },
+            icon: const Icon(Icons.add_circle_outline),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.favorite_border),
+            icon: const Icon(Icons.favorite_border),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.chat_bubble_outline),
+            icon: const Icon(Icons.chat_bubble_outline),
           )
         ],
       ),
