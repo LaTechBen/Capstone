@@ -39,7 +39,8 @@ class CreateOutfitBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CreateOutfitButton(icon: Icons.person, text: 'Add Image From Gallery'),
+          CreateOutfitButton(
+              icon: Icons.person, text: 'Add Image From Gallery'),
         ],
       ),
     );
@@ -51,12 +52,13 @@ class CreateOutfitButton extends StatelessWidget {
   final String text;
 
   CreateOutfitButton({required this.icon, required this.text});
-    
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         // Button Logic here
+        HomePage().getImageFromGallery();
         /*
         if (text == 'Account Information') {
             Navigator.push(
@@ -79,7 +81,7 @@ class CreateOutfitButton extends StatelessWidget {
               text,
               style: const TextStyle(fontSize: 18),
             ),
-            Opacity(opacity: 0, child: Icon(icon)), 
+            Opacity(opacity: 0, child: Icon(icon)),
           ],
         ),
       ),
