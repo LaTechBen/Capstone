@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 
 void main() {
@@ -45,7 +47,14 @@ class AccountInfoPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-      ),
+        actions: [
+        IconButton(
+          icon: const Icon(Icons.check),
+          // Insert Confirm Page Logic Here
+          onPressed: () {},
+        ),
+      ],
+    ),
       body: Center (
         child: Column( 
           mainAxisAlignment: MainAxisAlignment.center,
@@ -59,14 +68,26 @@ class AccountInfoPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                  // Insert Take Picture Logic
+                  onPressed: () async {
+                  var status = await Permission.camera.status;
+                  if(status.isDenied){
+                    Permission.camera.request();
+                  }
+                  else if (status.isGranted){
+                    // upload logic
+                  }
                 },
                 child: const Text('Take Picture'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                  // Insert Upload Logic
+                  onPressed: () async {
+                  var status = await Permission.manageExternalStorage.status;
+                  if(status.isDenied){
+                    Permission.manageExternalStorage.request();
+                  }
+                  else if (status.isGranted){
+                    // open storage
+                  }
                   },
                   child: const Text('Upload from Gallery'),
                 ),

@@ -1,8 +1,17 @@
+import 'dart:io';
+import 'package:accentuate/createoutfit_page.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
+
+  // Public method to delegate the call to _HomePageState's private method
+  Future<void> getImageFromGallery() async {
+    return await _HomePageState()._getImageFromGallery();
+  }
 }
 
 class _HomePageState extends State<HomePage> {
@@ -28,7 +37,6 @@ class _HomePageState extends State<HomePage> {
     "images/p8.jpg",
     "images/p9.jpg",
   ];
-
 
   // Map to store like counts for each post index
   Map<int, int> likeCounts = {
@@ -95,6 +103,26 @@ class _HomePageState extends State<HomePage> {
     await Future.delayed(Duration(seconds: 1));
   }
 
+  File? _selectedImage;
+
+  Future<void> _requestPermissions() async {
+    // Request permission to access the gallery
+    var status = await Permission.photos.request();
+    if (!status.isGranted) {
+      // Handle permission denied scenario
+      print('Permission denied to access gallery');
+    }
+  }
+
+  Future _getImageFromGallery() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _selectedImage = File(returnedImage!.path);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,16 +133,22 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.add_circle_outline),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const CreateOutfitPage()),
+              );
+            },
+            icon: const Icon(Icons.add_circle_outline),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.favorite_border),
+            icon: const Icon(Icons.favorite_border),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.chat_bubble_outline),
+            icon: const Icon(Icons.chat_bubble_outline),
           )
         ],
       ),
@@ -321,7 +355,6 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             "View all 12 comments",
                             style: TextStyle(color: Colors.black38),
-
                           )
                         ],
                       ),
