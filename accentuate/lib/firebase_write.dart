@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,15 +12,15 @@ class Write {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<String> storeImage(
-      String childname, Uint8List file, bool isPost) async {
-    Reference ref = _storage.ref().child(_auth.currentUser!.uid);
+      String childname, File file, bool isPost) async {
+    Reference ref = _storage.ref().child(childname).child(_auth.currentUser!.uid);
 
     if (isPost) {
       String id = const Uuid().v1();
       ref = ref.child(id);
     }
 
-    UploadTask uploadTask = ref.putData(file);
+    final uploadTask = ref.putFile(file);
 
     TaskSnapshot snapshot = await uploadTask;
     String downloadUrl = await snapshot.ref.getDownloadURL();
@@ -27,7 +28,7 @@ class Write {
   }
 
   Future<String> uploadImage(
-      String description, Uint8List file, String uid, String username) async {
+      String description, File file, String uid, String username) async {
     String response = "Error occured";
     try {
       String photoUrl = await storeImage('posts', file, true);
