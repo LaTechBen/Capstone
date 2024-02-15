@@ -73,6 +73,7 @@ class AccountInfoPage extends StatelessWidget {
                       Permission.camera.request();
                     } else if (status.isGranted) {
                       // upload logic
+                      HomePage().getImageFromCamera();
                     }
                   },
                   child: const Text('Take Picture'),

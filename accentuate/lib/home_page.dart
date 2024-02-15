@@ -12,6 +12,20 @@ class HomePage extends StatefulWidget {
   Future<void> getImageFromGallery() async {
     return await _HomePageState()._getImageFromGallery();
   }
+
+  // Public method to open the camera app to take a picture
+  Future getImageFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      // You can use the picked file to display the image where you need.
+      File imageFile = File(pickedFile.path);
+      // You can now use this imageFile to display the image.
+    } else {
+      print('No image selected.');
+    }
+  }
 }
 
 class _HomePageState extends State<HomePage> {
