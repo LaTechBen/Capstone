@@ -71,20 +71,20 @@ class SettingsButton extends StatelessWidget {
   final String text;
 
   SettingsButton({required this.icon, required this.text});
-    
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         // Button Logic here
         if (text == 'Account Information') {
-            Navigator.push(
-            context, 
+          Navigator.push(
+            context,
             MaterialPageRoute(builder: (context) => const AccountInfoPage()),
           );
         } else if (text == 'Personal Information') {
-            Navigator.push(
-            context, 
+          Navigator.push(
+            context,
             MaterialPageRoute(builder: (context) => const PersonalInfoPage()),
           );
         }
@@ -103,7 +103,7 @@ class SettingsButton extends StatelessWidget {
               text,
               style: const TextStyle(fontSize: 18),
             ),
-            Opacity(opacity: 0, child: Icon(icon)), 
+            Opacity(opacity: 0, child: Icon(icon)),
           ],
         ),
       ),

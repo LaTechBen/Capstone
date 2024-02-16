@@ -33,11 +33,11 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
-          home: MyHomePage(
+        home: MyHomePage(
           title: "",
         )
 
-        //home: SigninPage()
+        // home: SigninPage()
         //home: CreateOutfitPage()
         );
   }
