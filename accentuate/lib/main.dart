@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         //   home: MyHomePage(
         //   title: "",
         // )
-        home: UserPage()
+        home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
         //home: SigninPage()
         //home: CreateOutfitPage()
         );
