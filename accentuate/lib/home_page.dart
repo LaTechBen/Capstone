@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
+  static File? selectedImage;
+
   @override
   _HomePageState createState() => _HomePageState();
 
@@ -20,7 +22,7 @@ class HomePage extends StatefulWidget {
 
     if (pickedFile != null) {
       // You can use the picked file to display the image where you need.
-      File imageFile = File(pickedFile.path);
+      HomePage.selectedImage = File(pickedFile.path);
       // You can now use this imageFile to display the image.
     } else {
       print('No image selected.');
