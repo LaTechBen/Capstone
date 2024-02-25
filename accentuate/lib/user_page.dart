@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-// import 'dart:math';
+import 'package:intl/intl.dart';
 import 'dart:developer';
+import 'userPageImageDisplay.dart';
 
 class UserPage extends StatefulWidget {
   // uid id required to know whose profile to show.
@@ -20,7 +21,7 @@ class _UserPageState extends State<UserPage> {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   var userData = {};
   int postLength = 0;
-  num likes = 0;
+  int likes = 0;
   int followers = 0;
   int following = 0;
   bool isFollowing = false;
@@ -62,7 +63,8 @@ class _UserPageState extends State<UserPage> {
       isFollowing =
           userSnap.data()!['followers'].contains(_auth.currentUser!.uid);
       for (DocumentSnapshot post in postSnap.docs) {
-        likes += post['likes'];
+        int postLikes = post['likes'].length;
+        likes += postLikes;
       }
 
       setState(() {});
@@ -85,84 +87,132 @@ class _UserPageState extends State<UserPage> {
           )
         : Scaffold(
             appBar: AppBar(
-              backgroundColor: Colors.pink,
-              title: Text(
-                testing ? 'Username' : userData['username'],
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              backgroundColor: const Color.fromARGB(255, 233, 30, 99),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    testing ? 'Username' : userData['username'],
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  widget.uid == _auth.currentUser?.uid
+                      ? Container(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Container(
+                            height: 36,
+                            width: 120,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                ),
+                                borderRadius: BorderRadius.circular(5)),
+                            child: TextButton(
+                              onPressed: () => {},
+                              child: const Text(
+                                'Edit Profile',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : isFollowing
+                          ? Container(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Container(
+                                height: 36,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black,
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: TextButton(
+                                  onPressed: () => setState(
+                                    () {
+                                      isFollowing = !isFollowing;
+                                    },
+                                  ),
+                                  child: const Text(
+                                    'Unfollow',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Container(
+                                height: 36,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: TextButton(
+                                  onPressed: () => setState(
+                                    () {
+                                      isFollowing = !isFollowing;
+                                    },
+                                  ),
+                                  child: const Text(
+                                    'Follow',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                ],
               ),
             ),
             body: ListView(
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 30, horizontal: 25),
-                  alignment: Alignment.bottomCenter,
-                  height: screenHeight * .2,
-                  decoration: const BoxDecoration(color: Colors.pink),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
                     children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(
-                            testing ? 'Username' : userData['username'],
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          CircleAvatar(
+                            backgroundColor: Colors.black,
+                            radius: 40,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.pinkAccent,
+                              backgroundImage: userData['profImage'],
+                              radius: 38,
+                              child: Text(
+                                  testing
+                                      ? 'US'
+                                      : userData['username']
+                                          .substring(0, 2)
+                                          .toUpperCase(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 40)),
                             ),
                           ),
-                          //Followers
-                          Text(
-                            'followers: $followers',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                            ),
-                          ),
-                          //Following
-                          Text(
-                            'following: $following',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                            ),
-                          ),
-                          //Likes
-                          Text(
-                            'likes: $likes',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                            ),
-                          ),
+                          statColumn(followers, 'Followers'),
+                          statColumn(postLength, 'Posts'),
+                          statColumn(likes, 'Likes'),
                         ],
-                      ),
-                      const SizedBox(
-                        width: 40,
-                      ),
-                      CircleAvatar(
-                        backgroundColor: Colors.black,
-                        radius: 40,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.pinkAccent,
-                          backgroundImage: userData['profImage'],
-                          radius: 38,
-                          child: Text(
-                              testing
-                                  ? 'US'
-                                  : userData['username']
-                                      .substring(0, 2)
-                                      .toUpperCase(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 40)),
-                        ),
                       ),
                     ],
                   ),
@@ -194,13 +244,24 @@ class _UserPageState extends State<UserPage> {
                           DocumentSnapshot snap =
                               (snapshot.data! as dynamic).docs[index];
 
-                          return SizedBox(
-                            child: Image(
-                              image: NetworkImage(
-                                snap['postUrl'],
+                          return GestureDetector(
+                            child: SizedBox(
+                              child: Image(
+                                image: NetworkImage(
+                                  snap['postUrl'],
+                                ),
+                                fit: BoxFit.cover,
                               ),
-                              fit: BoxFit.cover,
                             ),
+                            onTap: () => {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserPageImageDisplay(
+                                      imagePath: snap['postUrl']),
+                                ),
+                              ),
+                            },
                           );
                         },
                       );
@@ -210,6 +271,34 @@ class _UserPageState extends State<UserPage> {
               ],
             ),
           );
+  }
+
+  Column statColumn(int stat, String statLabel) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          NumberFormat.compact().format(stat),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        //Followers
+        Container(
+          margin: const EdgeInsets.only(top: 5),
+          child: Text(
+            statLabel,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
     
