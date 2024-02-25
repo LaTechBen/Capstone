@@ -77,7 +77,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ? SettingsPage()
           : currentPage == 1
               ? SearchPage()
-              : HomePage(),
+              : currentPage == 4
+                  ? UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+                  : HomePage(),
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
@@ -164,7 +166,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           const Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                currentPage = 4;
+              });
+            },
             icon: const Icon(
               Icons.person,
             ),
