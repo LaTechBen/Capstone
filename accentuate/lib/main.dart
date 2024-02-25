@@ -7,6 +7,7 @@ import 'signup_page.dart';
 import 'settings_page.dart';
 import 'search_page.dart';
 import 'createoutfit_page.dart';
+import 'user_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +34,11 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
-        home: MyHomePage(
-          title: "",
-        )
-
-        // home: SigninPage()
+        //   home: MyHomePage(
+        //   title: "",
+        // )
+        // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+        home: SigninPage()
         //home: CreateOutfitPage()
         );
   }
