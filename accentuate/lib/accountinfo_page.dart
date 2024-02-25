@@ -58,11 +58,11 @@ class AccountInfoPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 80,
-              // backgroundImage: HomePage.selectedImage != null
-              //   ? FileImage(HomePage.selectedImage!)
-              //   : null,
+              backgroundImage: HomePage.selectedImage != null
+                  ? FileImage(HomePage.selectedImage!)
+                  : null,
             ),
             const SizedBox(height: 20),
             Row(
