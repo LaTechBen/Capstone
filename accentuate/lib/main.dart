@@ -1,5 +1,6 @@
 import 'package:accentuate/firebase_options.dart';
 import 'package:accentuate/signin_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
@@ -37,8 +38,8 @@ class MyApp extends StatelessWidget {
         //   home: MyHomePage(
         //   title: "",
         // )
-        // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
-        home: SigninPage()
+         // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+         home: SigninPage()
         //home: CreateOutfitPage()
         );
   }
@@ -63,6 +64,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  
+  void goToUserPage(BuildContext context){
+    if(_auth.currentUser?.uid == null){
+      return;
+    }
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => UserPage(uid: _auth.currentUser!.uid)));
+  }
   int currentPage = 0;
   @override
   Widget build(BuildContext context) {

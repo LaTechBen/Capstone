@@ -1,4 +1,4 @@
-import 'package:accentuate/authentication/firebase_auth_service.dart';
+import 'package:accentuate/firebase_api_calls/firebase_auth_service.dart';
 import 'package:accentuate/signin_page.dart';
 import 'package:flutter/material.dart';
 
