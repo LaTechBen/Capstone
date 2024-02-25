@@ -1,4 +1,4 @@
-import 'package:accentuate/authentication/firebase_auth_service.dart';
+import 'package:accentuate/firebase_api_calls/firebase_auth_service.dart';
 import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
 import 'package:accentuate/signin_page.dart';
@@ -17,6 +17,7 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   
   final FirebaseAuthService  _auth = FirebaseAuthService();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -38,6 +39,14 @@ class _SignupPageState extends State<SignupPage> {
     String email = _emailController.text;
     String password = _passwordController.text;
     String confirmPassword = _confirmPasswordController.text;
+    String username = _usernameController.text;
+
+    // check if username is valid
+    if(!isUsernameCompliant(username)){
+      const snackbar = SnackBar(content: Text("Please enter a username that is longer than 5 letters."));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return;
+    }
 
     // check if email is valid
     if(!isEmailCompliant(email)){
@@ -61,7 +70,7 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     // make call to firebase
-    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+    User? user = await _auth.signUpWithEmailAndPassword(email, password, username);
     const snackbar = SnackBar(content: Text("Please check your email to verify your account."));
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
@@ -101,7 +110,13 @@ class _SignupPageState extends State<SignupPage> {
     final regex = RegExp(pattern);
 
     return regex.hasMatch(email);
+}
 
+bool isUsernameCompliant(String username){
+  if(username == null || username.isEmpty || username.length < 6){
+    return false;
+  }
+  return true;
 
 }
 
@@ -122,6 +137,16 @@ class _SignupPageState extends State<SignupPage> {
           
               // padding
               const SizedBox(height: 10),
+
+              // username input
+              MyTextField(
+                controller: _usernameController,
+                hintText: 'Username',
+                obscureText: false,
+              ),
+          
+              // spacing
+              const SizedBox(height: 20),
           
               // email input
               MyTextField(
@@ -155,38 +180,38 @@ class _SignupPageState extends State<SignupPage> {
           
               MyButton(text: "Sign Up", onTap: signUserUp),
           
-              const SizedBox(height: 10),
+              // const SizedBox(height: 10),
           
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Sign up with',
-                          style: TextStyle(color: Colors.black),
-                        )),
-                    Expanded(
-                        child: Divider(
-                      thickness: 0.5,
-                      color: Colors.black,
-                    ))
-                  ],
-                ),
-              ),
+              // const Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 25.0),
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: Divider(
+              //           thickness: 0.5,
+              //           color: Colors.black,
+              //         ),
+              //       ),
+              //       Padding(
+              //           padding: EdgeInsets.symmetric(horizontal: 10.0),
+              //           child: Text(
+              //             'Sign up with',
+              //             style: TextStyle(color: Colors.black),
+              //           )),
+              //       Expanded(
+              //           child: Divider(
+              //         thickness: 0.5,
+              //         color: Colors.black,
+              //       ))
+              //     ],
+              //   ),
+              // ),
           
-              const SizedBox(height: 25),
+              // const SizedBox(height: 25),
           
-              GestureDetector(
-                  onTap: () => signUserInWithGoogle(context),
-                  child: Image.asset('images/android_neutral_rd_na@2x.png')),
+              // GestureDetector(
+              //     onTap: () => signUserInWithGoogle(context),
+              //     child: Image.asset('images/android_neutral_rd_na@2x.png')),
           
               const SizedBox(height: 25),
           
