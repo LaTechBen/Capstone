@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-
+import 'package:accentuate/home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.pink,
       ),
       home: const AccountInfoPage(),
-      );
+    );
   }
 }
 
@@ -29,13 +28,13 @@ class MyApp extends StatelessWidget {
 class AccountInfoPage extends StatelessWidget {
   const AccountInfoPage({Key? key}) : super(key: key);
 
-  @override 
+  @override
   Widget build(BuildContext context) {
-    return Scaffold( 
+    return Scaffold(
       appBar: AppBar(
         title: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:[
+          children: [
             Text('Account Information'),
             SizedBox(width: 8),
             Icon(Icons.person),
@@ -48,15 +47,15 @@ class AccountInfoPage extends StatelessWidget {
           },
         ),
         actions: [
-        IconButton(
-          icon: const Icon(Icons.check),
-          // Insert Confirm Page Logic Here
-          onPressed: () {},
-        ),
-      ],
-    ),
-      body: Center (
-        child: Column( 
+          IconButton(
+            icon: const Icon(Icons.check),
+            // Insert Confirm Page Logic Here
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const CircleAvatar(
@@ -69,25 +68,25 @@ class AccountInfoPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                  var status = await Permission.camera.status;
-                  if(status.isDenied){
-                    Permission.camera.request();
-                  }
-                  else if (status.isGranted){
-                    // upload logic
-                  }
-                },
-                child: const Text('Take Picture'),
+                    var status = await Permission.camera.status;
+                    if (status.isDenied) {
+                      Permission.camera.request();
+                    } else if (status.isGranted) {
+                      // upload logic
+                      HomePage().getImageFromCamera();
+                    }
+                  },
+                  child: const Text('Take Picture'),
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                  var status = await Permission.manageExternalStorage.status;
-                  if(status.isDenied){
-                    Permission.manageExternalStorage.request();
-                  }
-                  else if (status.isGranted){
-                    // open storage
-                  }
+                    var status = await Permission.manageExternalStorage.status;
+                    if (status.isDenied) {
+                      Permission.manageExternalStorage.request();
+                    } else if (status.isGranted) {
+                      // open storage
+                      HomePage().getImageFromGallery();
+                    }
                   },
                   child: const Text('Upload from Gallery'),
                 ),
@@ -99,5 +98,3 @@ class AccountInfoPage extends StatelessWidget {
     );
   }
 }
-
-
