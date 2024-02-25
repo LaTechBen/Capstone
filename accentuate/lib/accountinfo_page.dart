@@ -3,7 +3,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:accentuate/home_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 // Initializes and runs the app
@@ -60,7 +60,9 @@ class AccountInfoPage extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 80,
-              //backgroundImage: AssetImage(''),
+              // backgroundImage: HomePage.selectedImage != null
+              //   ? FileImage(HomePage.selectedImage!)
+              //   : null,
             ),
             const SizedBox(height: 20),
             Row(

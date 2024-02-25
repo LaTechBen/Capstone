@@ -5,15 +5,15 @@ import 'home_page.dart';
 class CreateOutfitPage extends StatelessWidget {
   const CreateOutfitPage({Key? key}) : super(key: key);
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          mainAxisAlignment:MainAxisAlignment.center,
+          children:[
             Text('Create Outfit'),
-            SizedBox(width: 8),
+            SizedBox(width:8),
             Icon(Icons.add),
           ],
         ),
@@ -23,6 +23,14 @@ class CreateOutfitPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            onPressed: () {
+              // Add your onPressed logic here
+            },
+          ),
+        ],
       ),
       body: const CreateOutfitBody(),
     );
