@@ -38,8 +38,8 @@ class MyApp extends StatelessWidget {
         //   home: MyHomePage(
         //   title: "",
         // )
-         // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
-         home: SigninPage()
+        // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+        home: SigninPage()
         //home: CreateOutfitPage()
         );
   }
@@ -65,14 +65,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
-  String? getUid(){
-    if(_auth.currentUser?.uid == null){
+
+  String? getUid() {
+    if (_auth.currentUser?.uid == null) {
       // this is the test db entry
       return 'qtdngM2pXSopCBDgC8zU';
     }
     return _auth.currentUser?.uid;
   }
+
   int currentPage = 0;
   @override
   Widget build(BuildContext context) {
