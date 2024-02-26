@@ -29,6 +29,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
 
+  cached_network_image: ^3.3.1
+
   uuid: ^4.3.2
 
   cloud_firestore: ^4.14.0

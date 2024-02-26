@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,15 +6,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../classes/image.dart';
+import '../classes/user.dart' as UserData;
 
 class Write {
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<String> storeImage(
-      String childname, File file, bool isPost) async {
-    Reference ref = _storage.ref().child(childname).child(_auth.currentUser!.uid);
+  Future<String> storeImage(String childname, File file, bool isPost) async {
+    Reference ref =
+        _storage.ref().child(childname).child(_auth.currentUser!.uid);
 
     if (isPost) {
       String id = const Uuid().v1();
@@ -28,22 +30,55 @@ class Write {
   }
 
   Future<String> uploadImage(
-      String description, File file, String uid, String username) async {
+      String description, File file, String uid, String username,
+      {bool isProfile = false}) async {
     String response = "Error occured";
     try {
-      String photoUrl = await storeImage('posts', file, true);
-      String postID = const Uuid().v1();
+      String photoUrl;
+      if (isProfile) {
+        //   var profileData = await _firebase
+        //     .collection('users')
+        //     .doc(uid)
+        //     .collection('profile-image')
+        //     .get();
 
-      Image img = Image(
+        // for (DocumentSnapshot snap in profileData.docs) {
+        //   snap.reference.delete();
+        // }
+
+        photoUrl = await storeImage('profiles', file, false);
+
+        var userData = await _firebase.collection('users').doc(uid).get();
+
+        UserData.User user = UserData.User(
+          username: username,
+          profileImage: photoUrl,
+          following: userData['following'],
+        );
+
+        _firebase.collection('users').doc(uid).set(user.toJson());
+      } else {
+        photoUrl = await storeImage('posts', file, true);
+
+        String postID = const Uuid().v1();
+
+        Image img = Image(
           datePublished: DateTime.now(),
           description: description,
           likes: [],
           postID: postID,
           postUrl: photoUrl,
           uid: uid,
-          username: username);
+          username: username,
+        );
 
-      _firebase.collection('users').doc(uid).collection("posts").doc(postID).set(img.toJson());
+        _firebase
+            .collection('users')
+            .doc(uid)
+            .collection("posts")
+            .doc(postID)
+            .set(img.toJson());
+      }
       response = "Success!";
     } catch (error) {
       response = error.toString();

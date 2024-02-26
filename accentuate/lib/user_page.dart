@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 import 'dart:developer';
 import 'userPageImageDisplay.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class UserPage extends StatefulWidget {
   // uid id required to know whose profile to show.
@@ -20,6 +21,8 @@ class _UserPageState extends State<UserPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   var userData = {};
+  var userProfile = {};
+  var profImage;
   int postLength = 0;
   int likes = 0;
   int followers = 0;
@@ -157,7 +160,7 @@ class _UserPageState extends State<UserPage> {
                                 height: 36,
                                 width: 120,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                    color: Colors.white,
                                     border: Border.all(
                                       color: Colors.white,
                                     ),
@@ -195,19 +198,19 @@ class _UserPageState extends State<UserPage> {
                             backgroundColor: Colors.black,
                             radius: 40,
                             child: CircleAvatar(
-                              backgroundColor: Colors.pinkAccent,
-                              backgroundImage: userData['profImage'],
-                              radius: 38,
-                              child: Text(
-                                  testing
-                                      ? 'US'
-                                      : userData['username']
-                                          .substring(0, 2)
-                                          .toUpperCase(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 40)),
-                            ),
+                                backgroundColor: Colors.pinkAccent,
+                                backgroundImage:
+                                    NetworkImage(userData['profileImage']),
+                                radius: 38,
+                                child: userData['profileImage'] == Null
+                                    ? Text(
+                                        userData['username']
+                                            .substring(0, 2)
+                                            .toUpperCase(),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 40))
+                                    : const Text("")),
                           ),
                           statColumn(followers, 'Followers'),
                           statColumn(postLength, 'Posts'),

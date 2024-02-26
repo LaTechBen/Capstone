@@ -3,29 +3,30 @@ import 'package:accentuate/createoutfit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'firebase_api_calls/firebase_write.dart';
 
 class HomePage extends StatefulWidget {
-  static File? selectedImage;
+  //static File? selectedImage;
 
   @override
   _HomePageState createState() => _HomePageState();
 
   // Public method to delegate the call to _HomePageState's private method
-  Future<void> getImageFromGallery() async {
+  Future<File> getImageFromGallery() async {
     return await _HomePageState()._getImageFromGallery();
   }
 
   // Public method to open the camera app to take a picture
-  Future getImageFromCamera() async {
+  Future<File> getImageFromCamera() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       // You can use the picked file to display the image where you need.
-      HomePage.selectedImage = File(pickedFile.path);
+      return File(pickedFile.path);
       // You can now use this imageFile to display the image.
     } else {
-      print('No image selected.');
+      return File('');
     }
   }
 }
@@ -130,13 +131,11 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future _getImageFromGallery() async {
+  Future<File> _getImageFromGallery() async {
     final returnedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    setState(() {
-      _selectedImage = File(returnedImage!.path);
-    });
+    return File(returnedImage!.path);
   }
 
   @override
@@ -152,8 +151,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const CreateOutfitPage()),
+                MaterialPageRoute(builder: (context) => CreateOutfitPage()),
               );
             },
             icon: const Icon(Icons.add_circle_outline),
