@@ -55,8 +55,9 @@ class _UserPageState extends State<UserPage> {
       var userSnap = await _firestore.collection('users').doc(widget.uid).get();
 
       var postSnap = await _firestore
+          .collection('users')
+          .doc(widget.uid)
           .collection('posts')
-          .where('uid', isEqualTo: widget.uid)
           .get();
 
       userData = userSnap.data()!;
@@ -224,8 +225,9 @@ class _UserPageState extends State<UserPage> {
                 Expanded(
                   child: FutureBuilder(
                     future: _firestore
+                        .collection('users')
+                        .doc(widget.uid)
                         .collection('posts')
-                        .where('uid', isEqualTo: widget.uid)
                         .get(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
