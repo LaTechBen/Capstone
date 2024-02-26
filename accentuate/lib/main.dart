@@ -66,12 +66,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   
-  void goToUserPage(BuildContext context){
+  String? getUid(){
     if(_auth.currentUser?.uid == null){
-      return;
+      // this is the test db entry
+      return 'qtdngM2pXSopCBDgC8zU';
     }
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => UserPage(uid: _auth.currentUser!.uid)));
+    return _auth.currentUser?.uid;
   }
   int currentPage = 0;
   @override
@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           : currentPage == 1
               ? SearchPage()
               : currentPage == 4
-                  ? UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+                  ? UserPage(uid: getUid())
                   : HomePage(),
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to

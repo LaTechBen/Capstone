@@ -43,7 +43,7 @@ class Write {
           uid: uid,
           username: username);
 
-      _firebase.collection('posts').doc(postID).set(img.toJson());
+      _firebase.collection('users').doc(uid).collection("posts").doc(postID).set(img.toJson());
       response = "Success!";
     } catch (error) {
       response = error.toString();

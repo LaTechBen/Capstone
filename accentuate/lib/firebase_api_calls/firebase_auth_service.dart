@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:uuid/uuid.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
 
   Future<User?> signUpWithEmailAndPassword(String email, String password, String username) async {
+    String postID = const Uuid().v1();
     try{
       UserCredential credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       await _auth.currentUser?.sendEmailVerification().then((value) => {

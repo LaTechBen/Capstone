@@ -8,7 +8,7 @@ import 'userPageImageDisplay.dart';
 
 class UserPage extends StatefulWidget {
   // uid id required to know whose profile to show.
-  final String uid;
+  final String? uid;
   const UserPage({super.key, required this.uid});
 
   @override
