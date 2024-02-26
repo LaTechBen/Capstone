@@ -55,7 +55,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   storeImage() async {
     await _write.uploadImage(
         '', selectedImage, _auth.currentUser!.uid, userdata['username'],
-        isProfile: true);
+        isProfile: false);
   }
 
   @override
