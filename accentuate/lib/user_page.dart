@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 import 'dart:developer';
-import 'userPageImageDisplay.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'userPagePostDisplay.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 
 class UserPage extends StatefulWidget {
   // uid id required to know whose profile to show.
@@ -210,7 +210,7 @@ class _UserPageState extends State<UserPage> {
                                             .toUpperCase(),
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 40))
+                                            fontSize: 40),)
                                     : const Text("")),
                           ),
                           statColumn(followers, 'Followers'),
@@ -262,8 +262,11 @@ class _UserPageState extends State<UserPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => UserPageImageDisplay(
-                                      imagePath: snap['postUrl']),
+                                  builder: (context) =>
+                                      const UserPagePostDisplay(
+                                          // post: snap,
+                                          // userData: userData,
+                                          ),
                                 ),
                               ),
                             },
@@ -306,141 +309,3 @@ class _UserPageState extends State<UserPage> {
     );
   }
 }
-    
-    
-    
-    
-    
-    
-//     return isLoading
-//         ? const Center(
-//             child: CircularProgressIndicator(),
-//           )
-//         : Scaffold(
-//             appBar: AppBar(
-//               toolbarHeight: MediaQuery.of(context).size.height * .2,
-//               flexibleSpace: SizedBox(
-//                 child: Row(
-//                   children: [
-//                     Container(
-//                       child: Column(
-//                         children: [
-//                           Flexible(
-//                             child: Align(
-//                               alignment: Alignment.centerRight,
-//                               child: Text(
-//                                 testing ? 'Username' : userData['username'],
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     Flexible(
-//                       child: Align(
-//                         alignment: Alignment.center,
-//                         child: CircleAvatar(
-//                           radius: 40,
-//                           backgroundColor: Colors.pink,
-//                           child: CircleAvatar(
-//                             radius: 38,
-//                             backgroundImage: userData['userProfImg'],
-//                             backgroundColor: Colors.white,
-//                             child: Text(
-//                                 testing
-//                                     ? 'US'
-//                                     : userData['username']
-//                                         .substring(0, 2)
-//                                         .toUpperCase(),
-//                                 style: const TextStyle(
-//                                     fontWeight: FontWeight.bold, fontSize: 40)),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//             body: GridView.builder(
-//               scrollDirection: Axis.vertical,
-//               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//                 crossAxisCount: 4,
-//                 mainAxisSpacing: 2.0,
-//                 crossAxisSpacing: 2.0,
-//               ),
-//               itemCount: testing ? 25 : postLength,
-//               itemBuilder: (context, index) {
-//                 return Padding(
-//                   padding: const EdgeInsets.all(1.0),
-//                   child: Container(
-//                     color: Colors.blue, // color of grid items
-//                     child: Center(
-//                       child: Text(
-//                         index.toString(),
-//                         style: const TextStyle(
-//                             fontSize: 18.0, color: Colors.white),
-//                       ),
-//                     ),
-//                   ),
-//                 );
-//               },
-//             ),
-//           );
-//   }
-// }
-
-
-
-
-// Column(
-//       children: [
-//         Container(
-//           height: MediaQuery.of(context).size.height * .2,
-//           decoration: const BoxDecoration(
-//             border: Border(
-//               bottom: BorderSide(
-//                 color: Colors.black,
-//               ),
-//             ),
-//           ),
-//           child: Row(
-//             children: [
-//               Text(
-//                 testing ? 'Username' : userData['username'],
-//                 style: const TextStyle(
-//                   fontSize: 20,
-//                   color: Colors.black,
-//                 ),
-//               ),
-//               Flexible(
-//                 child: Align(
-//                   alignment: Alignment.centerRight,
-//                   child: CircleAvatar(
-//                     radius: 40,
-//                     backgroundColor: Colors.pink,
-//                     child: CircleAvatar(
-//                       radius: 38,
-//                       backgroundImage: userData['userProfImg'],
-//                       backgroundColor: Colors.white,
-//                       child: Text(
-//                           testing
-//                               ? 'US'
-//                               : userData['username']
-//                                   .substring(0, 2)
-//                                   .toUpperCase(),
-//                           style: const TextStyle(
-//                               fontWeight: FontWeight.bold, fontSize: 40)),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//         const Padding(
-//           padding: EdgeInsets.all(
-//             1.0,
-//           ),
-//         ),
-        

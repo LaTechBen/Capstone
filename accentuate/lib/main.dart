@@ -1,5 +1,6 @@
 import 'package:accentuate/firebase_options.dart';
 import 'package:accentuate/signin_page.dart';
+import 'package:accentuate/userPagePostDisplay.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -23,25 +24,26 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Accentuate',
-        theme: ThemeData(
-          appBarTheme: AppBarTheme(
-            elevation: 1,
-            color: Colors.white,
-            iconTheme: IconThemeData(color: Colors.pink),
-          ),
+      debugShowCheckedModeBanner: false,
+      title: 'Accentuate',
+      theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          elevation: 1,
+          color: Colors.white,
           iconTheme: IconThemeData(color: Colors.pink),
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
-          useMaterial3: true,
         ),
-        //   home: MyHomePage(
-        //   title: "",
-        // )
-        // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
-        home: SigninPage()
-        //home: CreateOutfitPage()
-        );
+        iconTheme: const IconThemeData(color: Colors.pink),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
+        useMaterial3: true,
+      ),
+      //   home: MyHomePage(
+      //   title: "",
+      // )
+      // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+      home: const UserPagePostDisplay(),
+      // home: SigninPage()
+      //home: CreateOutfitPage()
+    );
   }
 }
 
@@ -85,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       body: currentPage == 2
-          ? SettingsPage()
+          ? const SettingsPage()
           : currentPage == 1
               ? SearchPage()
               : currentPage == 4

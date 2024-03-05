@@ -52,10 +52,12 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
     }
   }
 
-  storeImage() async {
+  storeImage(context) async {
     await _write.uploadImage(
         '', selectedImage, _auth.currentUser!.uid, userdata['username'],
         isProfile: false);
+        
+    Navigator.pop(context);
   }
 
   @override
@@ -81,8 +83,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
             icon: const Icon(Icons.check),
             onPressed: () {
               // Add your onPressed logic here
-              storeImage();
-              Navigator.pop(context);
+              storeImage(context);
             },
           ),
         ],
