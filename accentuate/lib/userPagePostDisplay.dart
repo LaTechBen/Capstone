@@ -30,7 +30,7 @@ class _UserPagePostDisplayState extends State<UserPagePostDisplay> {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.pink,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
