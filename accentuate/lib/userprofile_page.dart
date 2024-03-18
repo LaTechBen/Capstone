@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 import 'dart:developer';
-import 'userPagePostDisplay.dart';
+import 'userprofilePagePostDisplay.dart';
 // import 'package:cached_network_image/cached_network_image.dart';
 
 class UserPage extends StatefulWidget {

@@ -1,6 +1,7 @@
+import 'package:accentuate/classes/waitPage.dart';
 import 'package:accentuate/firebase_options.dart';
 import 'package:accentuate/signin_page.dart';
-import 'package:accentuate/userPagePostDisplay.dart';
+import 'package:accentuate/userprofilePagePostDisplay.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,8 @@ import 'signup_page.dart';
 import 'settings_page.dart';
 import 'search_page.dart';
 import 'createoutfit_page.dart';
-import 'user_page.dart';
+import 'userprofile_page.dart';
+import 'classes/waitPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,26 +26,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Accentuate',
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          elevation: 1,
-          color: Colors.white,
-          iconTheme: IconThemeData(color: Colors.pink),
+        debugShowCheckedModeBanner: false,
+        title: 'Accentuate',
+        theme: ThemeData(
+          appBarTheme: const AppBarTheme(
+            elevation: 1,
+            color: Colors.white,
+            iconTheme: IconThemeData(color: Colors.pink),
+          ),
+          iconTheme: const IconThemeData(color: Colors.pink),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
+          useMaterial3: true,
         ),
-        iconTheme: const IconThemeData(color: Colors.pink),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
-        useMaterial3: true,
-      ),
-      //   home: MyHomePage(
-      //   title: "",
-      // )
-      // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
-      home: const UserPagePostDisplay(),
-      // home: SigninPage()
-      //home: CreateOutfitPage()
-    );
+        //   home: MyHomePage(
+        //   title: "",
+        // )
+        // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+        // home: const UserPagePostDisplay(),
+        home: SigninPage()
+        //home: CreateOutfitPage()
+        // home: const UserPage(
+        //   uid: '0',
+        // ));
+        );
   }
 }
 
