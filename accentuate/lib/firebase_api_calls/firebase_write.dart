@@ -29,6 +29,27 @@ class Write {
     return downloadUrl;
   }
 
+  Future<List<String>> storeImages(String childname, List<File> files) async {
+    Reference ref =
+        _storage.ref().child(childname).child(_auth.currentUser!.uid);
+
+      List<String> fileUrls = [];
+    try{
+      for (File file in files){
+        String id = const Uuid().v1();
+        ref = ref.child(id);
+        final uploadTask = ref.putFile(file);
+        TaskSnapshot snapshot = await uploadTask;
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+        fileUrls.add(downloadUrl);
+      }
+    }
+    catch (error){
+      throw Exception("There was a problem with storing the images.");
+    }
+      return fileUrls;
+  }
+
   Future<String> uploadImage(
       String description, File file, String uid, String username,
       {bool isProfile = false}) async {
