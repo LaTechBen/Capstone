@@ -29,9 +29,9 @@ class Write {
     return downloadUrl;
   }
 
-  Future<List<String>> storeImages(String childname, List<File> files) async {
+  Future<List<String>> storeImages(List<File> files) async {
     Reference ref =
-        _storage.ref().child(childname).child(_auth.currentUser!.uid);
+        _storage.ref().child('posts').child(_auth.currentUser!.uid);
 
       List<String> fileUrls = [];
     try{

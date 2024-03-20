@@ -39,13 +39,13 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   }
 
   File selectedImage = File('');
-
+  List<File> selectedImages = [];
   final HomePage _homePage = HomePage();
 
   setGalleryImage() async {
     try {
       selectedImage = await _homePage.getImageFromGallery();
-
+      selectedImages.add(selectedImage);
       // setState(() {});
     } catch (e) {
       log(e.toString());
@@ -56,6 +56,10 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
     await _write.uploadImage(
         '', selectedImage, _auth.currentUser!.uid, userdata['username'],
         isProfile: false);
+  }
+
+  storeImages() async {
+    await _write.storeImages(selectedImages);
   }
 
   @override
@@ -81,7 +85,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
             icon: const Icon(Icons.check),
             onPressed: () {
               // Add your onPressed logic here
-              storeImage();
+              storeImages();
               Navigator.pop(context);
             },
           ),
