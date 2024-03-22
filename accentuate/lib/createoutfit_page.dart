@@ -127,6 +127,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
                 ),
               ),
             )
+            
           ],
         ),
       ),
