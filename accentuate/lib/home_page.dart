@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'firebase_api_calls/firebase_write.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'user_page.dart';
 
 class HomePage extends StatefulWidget {
-  //static File? selectedImage;
-
   @override
   _HomePageState createState() => _HomePageState();
 
@@ -32,6 +34,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Get a reference to storage root
+  Reference referenceRoot = FirebaseStorage.instance.ref();
+
+  // Initialize Firebase Storage reference
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
   List<String> profileImages = [
     "images/1.jpg",
     "images/2.jpg",
@@ -66,6 +76,7 @@ class _HomePageState extends State<HomePage> {
     7: 0,
     8: 0,
     9: 0,
+    10: 0,
   };
 
   // Map to store comments for each post index
@@ -79,12 +90,13 @@ class _HomePageState extends State<HomePage> {
     7: [],
     8: [],
     9: [],
+    10: [],
   };
 
   TextEditingController commentController = TextEditingController();
 
   // Maintain a list to keep track of the pressed state for each posts
-  List<bool> isLiked = List.filled(9, false);
+  List<bool> isLiked = List.filled(10, false);
 
   // Method to handle like button press
   void handleLikeButtonPress(int index) {
@@ -137,6 +149,47 @@ class _HomePageState extends State<HomePage> {
 
     return File(returnedImage!.path);
   }
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial value of imageUrl to an empty string
+    imageUrl = '';
+    postUrls = [];
+    // Retrieve the image from Firebase Storage
+    getImageUrl();
+  }
+
+  late List<String> postUrls;
+
+  Future<void> getImageUrl() async {
+    // Get the reference to the image file in Firebase Storage
+    final Reference ref =
+        storage.ref().child('posts/St24OcPlw5ZlxP8YNVKGShzhQPp2');
+    final ListResult result = await ref.listAll();
+    final List<String> urls = [];
+
+    final profileRef = storage.ref().child(
+        'profiles/St24OcPlw5ZlxP8YNVKGShzhQPp2/00bb0c50-7c87-1edb-910f-95c62c096c02');
+    final Purl = await profileRef.getDownloadURL();
+    // Iterate through the items and fetch download URLs for image files
+    await Future.forEach(result.items, (Reference reference) async {
+      // Check if the item is an image file (you can add more file extensions if needed)
+      final String url = await reference.getDownloadURL();
+      urls.add(url);
+      // print the URL for debugging
+      print('Download URL: $url');
+    });
+    // Get then imageUrl to download URL
+    setState(() {
+      postUrls = urls;
+      profileUrl = Purl;
+    });
+  }
+
+  late String imageUrl = '';
+  late String profileUrl = '';
+  final storage = FirebaseStorage.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -372,14 +425,197 @@ class _HomePageState extends State<HomePage> {
                           )
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
+
+            /* IMAGES FROM FIREBASE */
+
+            Divider(),
+            Column(
+              children: List.generate(
+                9,
+                (index) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //Header post
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: CircleAvatar(
+                            radius: 14,
+                            backgroundImage: AssetImage(
+                              "images/story.png",
+                            ),
+                            child: CircleAvatar(
+                              radius: 12,
+                              backgroundImage: NetworkImage(
+                                  profileUrl), //AssetImage("images/test.jpg"
+                              //     //profileImages[index],
+                              //     ),
+                            ),
+                          ),
+                        ),
+                        Text("samsamsam"),
+                        Spacer(),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.more_vert),
+                        )
+                      ],
+                    ),
+                    // Image Post
+                    Image.network(postUrls[index]),
+                    // Footer Post
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            handleLikeButtonPress(index);
+                          },
+                          icon: Icon(
+                            isLiked[index]
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            // Update the color based on the isLiked state
+                            color: isLiked[index] ? Colors.red : null,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // Open a dialog to add a comment
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Add Comment'),
+                                  content: TextField(
+                                    controller: commentController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter your comment',
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        // Handle adding a comment
+                                        handleCommentButtonPress(index);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Add'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          icon: Icon(Icons.comment_rounded),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.share_rounded),
+                        ),
+                      ],
+                    ),
+
+                    Container(
+                      padding: EdgeInsets.all(15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(text: "Liked by"),
+                                  TextSpan(
+                                    text: " Profile Name",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: likeCounts[index] == 0 ? " " : " and",
+                                  ),
+                                  TextSpan(
+                                    text: likeCounts[index] == 0
+                                        ? " "
+                                        : " ${likeCounts[index]} others",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ]),
+                          ),
+                          RichText(
+                            text: TextSpan(
+                                style: TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                    text: " Profile Name",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(text: " This is an amazing fit"),
+                                ]),
+                          ),
+                          // Display comments with user name in bold and comment in normal text
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: (commentsMap[index] ?? [])
+                                .map((comment) => Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 4),
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: DefaultTextStyle.of(context)
+                                              .style,
+                                          children: [
+                                            TextSpan(
+                                              text:
+                                                  'Profile name', // Assuming "Profile name" is the user name
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                                text:
+                                                    ' '), // Add space between user name and comment
+                                            TextSpan(text: comment),
+                                          ],
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+
+                          Text(
+                            "View all 12 comments",
+                            style: TextStyle(color: Colors.black38),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            /* END HERE */
           ]),
         ),
       ),
     );
   }
+
+  getApplicationDocumentsDirectory() {}
 }
