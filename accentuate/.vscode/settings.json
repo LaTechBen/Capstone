@@ -1,5 +1,6 @@
 {
 
-    "cmake.sourceDirectory": "C:/Users/yamur/OneDrive/Desktop/CSC405/homepage2/Capstone/accentuate/linux/flutter"
+    "cmake.sourceDirectory": "C:/Users/yamur/OneDrive/Desktop/CSC405/homepage2/Capstone/accentuate/linux/flutter",
+    "java.compile.nullAnalysis.mode": "automatic"
 
 }
