@@ -90,7 +90,7 @@ class SettingsButton extends StatelessWidget {
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.purpleAccent,
         foregroundColor: Colors.white,
       ),
       child: Padding(
