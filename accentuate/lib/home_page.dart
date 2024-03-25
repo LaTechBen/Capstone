@@ -453,7 +453,7 @@ class _HomePageState extends State<HomePage> {
                   Divider(),
                   Column(
                     children: List.generate(
-                      9,
+                      postUrls.length,
                       (index) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
