@@ -34,6 +34,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isLoading = false;
+
   // Get a reference to storage root
   Reference referenceRoot = FirebaseStorage.instance.ref();
 
@@ -163,14 +165,17 @@ class _HomePageState extends State<HomePage> {
   late List<String> postUrls;
 
   Future<void> getImageUrl() async {
+    setState(() {
+      isLoading = true;
+    });
     // Get the reference to the image file in Firebase Storage
     final Reference ref =
         storage.ref().child('posts/St24OcPlw5ZlxP8YNVKGShzhQPp2');
     final ListResult result = await ref.listAll();
     final List<String> urls = [];
 
-    final profileRef = storage.ref().child(
-        'profiles/St24OcPlw5ZlxP8YNVKGShzhQPp2/00bb0c50-7c87-1edb-910f-95c62c096c02');
+    final profileRef =
+        storage.ref().child('profiles/St24OcPlw5ZlxP8YNVKGShzhQPp2');
     final Purl = await profileRef.getDownloadURL();
     // Iterate through the items and fetch download URLs for image files
     await Future.forEach(result.items, (Reference reference) async {
@@ -184,6 +189,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       postUrls = urls;
       profileUrl = Purl;
+      isLoading = false;
     });
   }
 
@@ -193,428 +199,443 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Image.asset(
-          "images/logo.png",
-          height: 50,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CreateOutfitPage()),
-              );
-            },
-            icon: const Icon(Icons.add_circle_outline),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.favorite_border),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.chat_bubble_outline),
+    return isLoading
+        ? const Center(
+            child: CircularProgressIndicator(),
           )
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: onRefresh,
-        child: SingleChildScrollView(
-          child: Column(children: [
-            //Story
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(
-                  8,
-                  (index) => Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 35,
-                            backgroundImage: AssetImage(
-                              "images/story.png",
-                            ),
-                            child: CircleAvatar(
-                                radius: 32,
-                                backgroundImage: AssetImage(
-                                  profileImages[index],
-                                )),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "Profile Name",
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.black87),
-                          )
-                        ],
-                      )),
-                ),
+        : Scaffold(
+            appBar: AppBar(
+              title: Image.asset(
+                "images/logo.png",
+                height: 50,
               ),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CreateOutfitPage()),
+                    );
+                  },
+                  icon: const Icon(Icons.add_circle_outline),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.favorite_border),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.chat_bubble_outline),
+                )
+              ],
             ),
-            Divider(),
-            Column(
-              children: List.generate(
-                8,
-                (index) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //Header post
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: CircleAvatar(
-                            radius: 14,
-                            backgroundImage: AssetImage(
-                              "images/story.png",
-                            ),
-                            child: CircleAvatar(
-                              radius: 12,
-                              backgroundImage: AssetImage(
-                                profileImages[index],
+            body: RefreshIndicator(
+              onRefresh: onRefresh,
+              child: SingleChildScrollView(
+                child: Column(children: [
+                  //Story
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(
+                        8,
+                        (index) => Container(
+                            padding: EdgeInsets.all(10),
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: 35,
+                                  backgroundImage: AssetImage(
+                                    "images/story.png",
+                                  ),
+                                  child: CircleAvatar(
+                                      radius: 32,
+                                      backgroundImage: AssetImage(
+                                        profileImages[index],
+                                      )),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Profile Name",
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.black87),
+                                )
+                              ],
+                            )),
+                      ),
+                    ),
+                  ),
+                  Divider(),
+                  Column(
+                    children: List.generate(
+                      8,
+                      (index) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //Header post
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                child: CircleAvatar(
+                                  radius: 14,
+                                  backgroundImage: AssetImage(
+                                    "images/story.png",
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 12,
+                                    backgroundImage: AssetImage(
+                                      profileImages[index],
+                                    ),
+                                  ),
+                                ),
                               ),
+                              Text("Profile Name"),
+                              Spacer(),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.more_vert),
+                              )
+                            ],
+                          ),
+                          // Image Post
+                          Image.asset(posts[index]),
+                          // Footer Post
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  handleLikeButtonPress(index);
+                                },
+                                icon: Icon(
+                                  isLiked[index]
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  // Update the color based on the isLiked state
+                                  color: isLiked[index] ? Colors.red : null,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  // Open a dialog to add a comment
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Add Comment'),
+                                        content: TextField(
+                                          controller: commentController,
+                                          decoration: InputDecoration(
+                                            hintText: 'Enter your comment',
+                                          ),
+                                        ),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              // Handle adding a comment
+                                              handleCommentButtonPress(index);
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Add'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: Icon(Icons.comment_rounded),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.share_rounded),
+                              ),
+                            ],
+                          ),
+
+                          Container(
+                            padding: EdgeInsets.all(15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(text: "Liked by"),
+                                        TextSpan(
+                                          text: " Profile Name",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: likeCounts[index] == 0
+                                              ? " "
+                                              : " and",
+                                        ),
+                                        TextSpan(
+                                          text: likeCounts[index] == 0
+                                              ? " "
+                                              : " ${likeCounts[index]} others",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ]),
+                                ),
+                                RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(
+                                          text: " Profile Name",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                            text: " This is an amazing fit"),
+                                      ]),
+                                ),
+                                // Display comments with user name in bold and comment in normal text
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: (commentsMap[index] ?? [])
+                                      .map((comment) => Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 4),
+                                            child: RichText(
+                                              text: TextSpan(
+                                                style:
+                                                    DefaultTextStyle.of(context)
+                                                        .style,
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        'Profile name', // Assuming "Profile name" is the user name
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                      text:
+                                                          ' '), // Add space between user name and comment
+                                                  TextSpan(text: comment),
+                                                ],
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+
+                                Text(
+                                  "View all 12 comments",
+                                  style: TextStyle(color: Colors.black38),
+                                )
+                              ],
                             ),
                           ),
-                        ),
-                        Text("Profile Name"),
-                        Spacer(),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.more_vert),
-                        )
-                      ],
-                    ),
-                    // Image Post
-                    Image.asset(posts[index]),
-                    // Footer Post
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            handleLikeButtonPress(index);
-                          },
-                          icon: Icon(
-                            isLiked[index]
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            // Update the color based on the isLiked state
-                            color: isLiked[index] ? Colors.red : null,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            // Open a dialog to add a comment
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Add Comment'),
-                                  content: TextField(
-                                    controller: commentController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Enter your comment',
-                                    ),
-                                  ),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Handle adding a comment
-                                        handleCommentButtonPress(index);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Add'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          icon: Icon(Icons.comment_rounded),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.share_rounded),
-                        ),
-                      ],
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.all(15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                                style: TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(text: "Liked by"),
-                                  TextSpan(
-                                    text: " Profile Name",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: likeCounts[index] == 0 ? " " : " and",
-                                  ),
-                                  TextSpan(
-                                    text: likeCounts[index] == 0
-                                        ? " "
-                                        : " ${likeCounts[index]} others",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ]),
-                          ),
-                          RichText(
-                            text: TextSpan(
-                                style: TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                    text: " Profile Name",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  TextSpan(text: " This is an amazing fit"),
-                                ]),
-                          ),
-                          // Display comments with user name in bold and comment in normal text
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: (commentsMap[index] ?? [])
-                                .map((comment) => Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 4),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          style: DefaultTextStyle.of(context)
-                                              .style,
-                                          children: [
-                                            TextSpan(
-                                              text:
-                                                  'Profile name', // Assuming "Profile name" is the user name
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            TextSpan(
-                                                text:
-                                                    ' '), // Add space between user name and comment
-                                            TextSpan(text: comment),
-                                          ],
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                          ),
-
-                          Text(
-                            "View all 12 comments",
-                            style: TextStyle(color: Colors.black38),
-                          )
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
 
-            /* IMAGES FROM FIREBASE */
+                  /* IMAGES FROM FIREBASE */
 
-            Divider(),
-            Column(
-              children: List.generate(
-                9,
-                (index) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //Header post
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: CircleAvatar(
-                            radius: 14,
-                            backgroundImage: AssetImage(
-                              "images/story.png",
-                            ),
-                            child: CircleAvatar(
-                              radius: 12,
-                              backgroundImage: NetworkImage(
-                                  profileUrl), //AssetImage("images/test.jpg"
-                              //     //profileImages[index],
-                              //     ),
-                            ),
-                          ),
-                        ),
-                        Text("samsamsam"),
-                        Spacer(),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.more_vert),
-                        )
-                      ],
-                    ),
-                    // Image Post
-                    Image.network(postUrls[index]),
-                    // Footer Post
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            handleLikeButtonPress(index);
-                          },
-                          icon: Icon(
-                            isLiked[index]
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            // Update the color based on the isLiked state
-                            color: isLiked[index] ? Colors.red : null,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            // Open a dialog to add a comment
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Add Comment'),
-                                  content: TextField(
-                                    controller: commentController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Enter your comment',
-                                    ),
-                                  ),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Handle adding a comment
-                                        handleCommentButtonPress(index);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Add'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          icon: Icon(Icons.comment_rounded),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.share_rounded),
-                        ),
-                      ],
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.all(15),
-                      child: Column(
+                  Divider(),
+                  Column(
+                    children: List.generate(
+                      9,
+                      (index) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          RichText(
-                            text: TextSpan(
-                                style: TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(text: "Liked by"),
-                                  TextSpan(
-                                    text: " Profile Name",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          //Header post
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                child: CircleAvatar(
+                                  radius: 14,
+                                  backgroundImage: AssetImage(
+                                    "images/story.png",
                                   ),
-                                  TextSpan(
-                                    text: likeCounts[index] == 0 ? " " : " and",
+                                  child: CircleAvatar(
+                                    radius: 12,
+                                    backgroundImage: NetworkImage(
+                                        profileUrl), //AssetImage("images/test.jpg"
+                                    //     //profileImages[index],
+                                    //     ),
                                   ),
-                                  TextSpan(
-                                    text: likeCounts[index] == 0
-                                        ? " "
-                                        : " ${likeCounts[index]} others",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ]),
+                                ),
+                              ),
+                              Text("samsamsam"),
+                              Spacer(),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.more_vert),
+                              )
+                            ],
                           ),
-                          RichText(
-                            text: TextSpan(
-                                style: TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                    text: " Profile Name",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  TextSpan(text: " This is an amazing fit"),
-                                ]),
-                          ),
-                          // Display comments with user name in bold and comment in normal text
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: (commentsMap[index] ?? [])
-                                .map((comment) => Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 4),
-                                      child: RichText(
-                                        text: TextSpan(
-                                          style: DefaultTextStyle.of(context)
-                                              .style,
-                                          children: [
-                                            TextSpan(
-                                              text:
-                                                  'Profile name', // Assuming "Profile name" is the user name
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            TextSpan(
-                                                text:
-                                                    ' '), // Add space between user name and comment
-                                            TextSpan(text: comment),
-                                          ],
+                          // Image Post
+                          Image.network(postUrls[index]),
+                          // Footer Post
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  handleLikeButtonPress(index);
+                                },
+                                icon: Icon(
+                                  isLiked[index]
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  // Update the color based on the isLiked state
+                                  color: isLiked[index] ? Colors.red : null,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  // Open a dialog to add a comment
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Add Comment'),
+                                        content: TextField(
+                                          controller: commentController,
+                                          decoration: InputDecoration(
+                                            hintText: 'Enter your comment',
+                                          ),
                                         ),
-                                      ),
-                                    ))
-                                .toList(),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              // Handle adding a comment
+                                              handleCommentButtonPress(index);
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Add'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: Icon(Icons.comment_rounded),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.share_rounded),
+                              ),
+                            ],
                           ),
 
-                          Text(
-                            "View all 12 comments",
-                            style: TextStyle(color: Colors.black38),
-                          )
+                          Container(
+                            padding: EdgeInsets.all(15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(text: "Liked by"),
+                                        TextSpan(
+                                          text: " Profile Name",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: likeCounts[index] == 0
+                                              ? " "
+                                              : " and",
+                                        ),
+                                        TextSpan(
+                                          text: likeCounts[index] == 0
+                                              ? " "
+                                              : " ${likeCounts[index]} others",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ]),
+                                ),
+                                RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(
+                                          text: " Profile Name",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                            text: " This is an amazing fit"),
+                                      ]),
+                                ),
+                                // Display comments with user name in bold and comment in normal text
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: (commentsMap[index] ?? [])
+                                      .map((comment) => Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 4),
+                                            child: RichText(
+                                              text: TextSpan(
+                                                style:
+                                                    DefaultTextStyle.of(context)
+                                                        .style,
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        'Profile name', // Assuming "Profile name" is the user name
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                      text:
+                                                          ' '), // Add space between user name and comment
+                                                  TextSpan(text: comment),
+                                                ],
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+
+                                Text(
+                                  "View all 12 comments",
+                                  style: TextStyle(color: Colors.black38),
+                                )
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+
+                  /* END HERE */
+                ]),
               ),
             ),
-
-            /* END HERE */
-          ]),
-        ),
-      ),
-    );
+          );
   }
 
   getApplicationDocumentsDirectory() {}
