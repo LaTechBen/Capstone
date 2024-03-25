@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:string_similarity/string_similarity.dart'; 
+import 'package:string_similarity/string_similarity.dart';
 
 class SearchPage extends StatefulWidget {
   SearchPage({Key? key}) : super(key: key);
@@ -11,118 +10,214 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final TextEditingController _searchController = TextEditingController();
-  Future<List<DocumentSnapshot>>? _searchResults;
+  final FirebaseFirestore _firebase = FirebaseFirestore.instance;
+  late Future<List<DocumentSnapshot>> _trendingPosts;
+  Future<List<DocumentSnapshot>>? _searchPostResults;
+  Future<List<DocumentSnapshot>>? _searchUserResults;
+  String _currentView = 'posts';
 
-  Future<List<DocumentSnapshot>> getSearchResults(String query) async {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  String searchLower = query.toLowerCase();
-  final snapshot = await firestore.collection('posts').get();
+  @override
+  void initState() {
+    super.initState();
+    _trendingPosts = getTrendingPosts();
+  }
 
-  // Calculate relevance scores for each document based on description similarity
-  var scoredDocs = snapshot.docs.map((doc) {
-    var data = doc.data() as Map<String, dynamic>;
-    var description = data['description'].toLowerCase();
-    double similarity = description.similarityTo(searchLower); // Calculate similarity
-    return {'doc': doc, 'score': similarity}; // Return document with its score
-  }).toList();
+  Future<List<DocumentSnapshot>> getTrendingPosts() async {
+    final snapshot = await _firebase.collection('posts').orderBy('likes', descending: true).limit(25).get();
+    return snapshot.docs;
+  }
 
-  // Sort documents based on relevance score (descending order)
-  scoredDocs.sort((a, b) {
-    final scoreA = a['score'] as double?;
-    final scoreB = b['score'] as double?;
-    if (scoreA != null && scoreB != null) {
-      return scoreB.compareTo(scoreA);
-    } else {
-      return 0; 
+  Future<List<DocumentSnapshot>> searchPosts(String query) async {
+    final snapshot = await _firebase.collection('posts').get();
+    List<DocumentSnapshot> posts = snapshot.docs;
+
+    // Handle Null Case and Weight
+    if (query.isNotEmpty) {
+      posts = posts.where((post) {
+        var description = (post.data() as Map<String, dynamic>)['description'];
+        double score = _calculateRelevanceScore(description ?? '', query); 
+        return score > 0.5; 
+      }).toList();
+      
+      // Sort Post Based on Relevance Score
+      posts.sort((a, b) {
+        var descriptionA = (a.data() as Map<String, dynamic>)['description'];
+        var descriptionB = (b.data() as Map<String, dynamic>)['description'];
+        double scoreA = _calculateRelevanceScore(descriptionA ?? '', query);
+        double scoreB = _calculateRelevanceScore(descriptionB ?? '', query);
+        return scoreB.compareTo(scoreA);
+      });
     }
-  });
 
-  // Extract sorted documents without scores
-  var sortedDocs = scoredDocs
-      .map<DocumentSnapshot>((scoredDoc) => scoredDoc['doc'] as DocumentSnapshot)
-      .toList();
+    // Limit Results to 25 'posts'
+    return posts.take(25).toList();
+  }
 
-  print('Search Results:');
-  sortedDocs.forEach((doc) {
-    print(doc.data()); 
-  });
+  Future<List<DocumentSnapshot>> getUsers(String query) async {
+    final snapshot = await _firebase.collection('users').get();
+    List<DocumentSnapshot> users = snapshot.docs;
 
-  // Limit results to 15 documents
-  return sortedDocs.take(15).toList(); 
-}
+    // Handle Null Case for Users and Weight
+    if (query.isNotEmpty) {
+      users = users.where((user) {
+        var username = (user.data() as Map<String, dynamic>)['username'];
+        double score = _calculateRelevanceScore(username ?? '', query); // Handle null username
+        return score > 0.5; // You can adjust the threshold as needed
+      }).toList();
+    }
 
+    // Limit Results to 25 'users'
+    return users.take(25).toList();
+  }
+
+  double _calculateRelevanceScore(String text, String query) {
+    return text.similarityTo(query);
+  }
+
+  void _toggleView(String view) {
+    setState(() {
+      _currentView = view;
+    });
+  }
+
+  // Format and UI Elements
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Search"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              if (_searchController.text.isNotEmpty) {
-                setState(() {
-                  _searchResults = getSearchResults(_searchController.text);
-                });
-              }
-            },
-          )
-        ],
+        title: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.search),
+              SizedBox(width: 4),
+              Text("Search"),
+            ],
+          ),
+        ),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: "Search",
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
-                  onPressed: () => _searchController.clear(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _toggleView('posts'),
+                  icon: Icon(Icons.whatshot),
+                  label: Text('Trending Posts'),
                 ),
-              ),
-              onFieldSubmitted: (value) {
-                if (value.isNotEmpty) {
-                  setState(() {
-                    _searchResults = getSearchResults(value);
-                  });
-                }
-              },
+                ElevatedButton.icon(
+                  onPressed: () => _toggleView('people'),
+                  icon: Icon(Icons.person),
+                  label: Text('People'),
+                ),
+              ],
             ),
           ),
           Expanded(
-            child: _searchResults == null
-                ? Center(child: Text('Enter a search term to begin'))
-                : FutureBuilder<List<DocumentSnapshot>>(
-                    future: _searchResults,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(child: Text('No results found'));
-                      }
-
-                      var docs = snapshot.data!;
-                      return GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 4.0,
-                          mainAxisSpacing: 4.0,
+            child: _currentView == 'posts'
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              _searchPostResults = searchPosts(value);
+                            });
+                          },
+                          decoration: InputDecoration(
+                            labelText: "Search Posts",
+                            suffixIcon: Icon(Icons.search),
+                          ),
                         ),
-                        itemCount: docs.length,
-                        itemBuilder: (context, index) {
-                          var data = docs[index].data() as Map<String, dynamic>;
-                          return Image.network(data['postUrl'], fit: BoxFit.cover);
-                        },
-                      );
-                    },
+                      ),
+                      Expanded(
+                        child: FutureBuilder<List<DocumentSnapshot>>(
+                          future: _searchPostResults ?? _trendingPosts,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return Center(child: Text('No matching posts found'));
+                            }
+
+                            var posts = snapshot.data!;
+                            return GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 4.0,
+                                mainAxisSpacing: 4.0,
+                              ),
+                              itemCount: posts.length,
+                              itemBuilder: (context, index) {
+                               
+
+                                var data = posts[index].data() as Map<String, dynamic>;
+                                return Image.network(data['postUrl'], fit: BoxFit.cover);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              _searchUserResults = getUsers(value);
+                            });
+                          },
+                          decoration: InputDecoration(
+                            labelText: "Search Users",
+                            suffixIcon: Icon(Icons.search),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: FutureBuilder<List<DocumentSnapshot>>(
+                          future: _searchUserResults,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return Center(child: Text('No matching users found'));
+                            }
+
+                            var users = snapshot.data!;
+                            return ListView.builder(
+                              itemCount: users.length,
+                              itemBuilder: (context, index) {
+                                // Handle Null 'username'
+                                var username = (users[index].data() as Map<String, dynamic>?)?['username'] ?? ''; 
+                                return ListTile(
+                                  title: Text(username),                                 
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ],
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    title: 'Search Page',
+    home: SearchPage(),
+  ));
 }
