@@ -9,10 +9,14 @@ import 'settings_page.dart';
 import 'search_page.dart';
 import 'createoutfit_page.dart';
 import 'user_page.dart';
+import 'reverse_search_page.dart';
+import 'components/api_keys.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  Gemini.init(apiKey: gemini_api);
   runApp(const MyApp());
 }
 
@@ -26,12 +30,12 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Accentuate',
         theme: ThemeData(
-          appBarTheme: AppBarTheme(
+          appBarTheme: const AppBarTheme(
             elevation: 1,
             color: Colors.white,
             iconTheme: IconThemeData(color: Colors.pink),
           ),
-          iconTheme: IconThemeData(color: Colors.pink),
+          iconTheme: const IconThemeData(color: Colors.pink),
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
@@ -39,7 +43,8 @@ class MyApp extends StatelessWidget {
         //   title: "",
         // )
         // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
-        home: SigninPage()
+        // home: SigninPage()
+        home: const ReverseSearch()
         //home: CreateOutfitPage()
         );
   }
@@ -85,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       body: currentPage == 2
-          ? SettingsPage()
+          ? const SettingsPage()
           : currentPage == 1
               ? SearchPage()
               : currentPage == 4

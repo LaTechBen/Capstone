@@ -37,6 +37,7 @@ dependencies:
 
   flutter:
     sdk: flutter
+  # flutter_html: ^0.8.2
   
   # Used for image picking(for gallery)
   image_picker: ^0.8.6
@@ -51,6 +52,11 @@ dependencies:
   firebase_auth: ^4.16.0
   google_sign_in: ^6.2.1
   intl: ^0.19.0
+  url_launcher: ^6.2.5
+  flutter_html: ^2.1.2
+  cache_manager: ^1.0.0+4
+  flutter_cache_manager: ^3.3.1
+  flutter_gemini: ^2.0.3
 
 dev_dependencies:
   flutter_test:

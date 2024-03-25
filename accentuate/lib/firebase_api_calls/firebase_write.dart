@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,15 +36,6 @@ class Write {
     try {
       String photoUrl;
       if (isProfile) {
-        //   var profileData = await _firebase
-        //     .collection('users')
-        //     .doc(uid)
-        //     .collection('profile-image')
-        //     .get();
-
-        // for (DocumentSnapshot snap in profileData.docs) {
-        //   snap.reference.delete();
-        // }
 
         photoUrl = await storeImage('profiles', file, false);
 
