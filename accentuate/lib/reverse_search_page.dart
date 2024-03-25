@@ -7,6 +7,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:http/http.dart' as http;
 import "package:flutter_gemini/flutter_gemini.dart";
+import "home_page.dart";
 
 class ReverseSearch extends StatefulWidget {
   const ReverseSearch({super.key});
@@ -20,10 +21,13 @@ class _ReverseSearchState extends State<ReverseSearch> {
   final Uri _url = Uri.parse(
       "https://www.googleapis.com/customsearch/v1?key=$search_api&cx=$contextKey&q=&start=$start");
   File selectedImage = File('');
+  final HomePage _homePage = HomePage();
 
   setGalleryImage() async {
     try {
       selectedImage = await _homePage.getImageFromGallery();
+
+      geminiResult(image: selectedImage);
 
       // setState(() {});
     } catch (e) {
@@ -36,12 +40,8 @@ class _ReverseSearchState extends State<ReverseSearch> {
     return const Scaffold(
         body: Center(
       child: TextButton(
-        style: TextButton.styleFrom(
-          textStyle: TextStyle(fontSize: 20),
-        ),
-        onPressed: () => {
-          setGalleryImage()
-          },
+        style: TextStyle(fontSize: 20),
+        onPressed: () => {setGalleryImage()},
         child: Text('Click'),
       ),
     ));
