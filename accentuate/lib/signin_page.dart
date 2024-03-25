@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:accentuate/accountinfo_page.dart';
-import 'package:accentuate/authentication/firebase_auth_service.dart';
+import 'package:accentuate/firebase_api_calls/firebase_auth_service.dart';
 import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
 import 'package:accentuate/signup_page.dart';
@@ -130,38 +130,38 @@ class _SigninPageState extends State<SigninPage> {
           
               MyButton(text: "Sign In", onTap: signUserIn),
           
-              const SizedBox(height: 10),
+              // const SizedBox(height: 10),
           
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Continue with',
-                          style: TextStyle(color: Colors.black),
-                        )),
-                    Expanded(
-                        child: Divider(
-                      thickness: 0.5,
-                      color: Colors.black,
-                    ))
-                  ],
-                ),
-              ),
+              // const Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 25.0),
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: Divider(
+              //           thickness: 0.5,
+              //           color: Colors.black,
+              //         ),
+              //       ),
+              //       Padding(
+              //           padding: EdgeInsets.symmetric(horizontal: 10.0),
+              //           child: Text(
+              //             'Continue with',
+              //             style: TextStyle(color: Colors.black),
+              //           )),
+              //       Expanded(
+              //           child: Divider(
+              //         thickness: 0.5,
+              //         color: Colors.black,
+              //       ))
+              //     ],
+              //   ),
+              // ),
           
-              const SizedBox(height: 25),
+              // const SizedBox(height: 25),
           
-              GestureDetector(
-                  onTap: () => signUserInWithGoogle(context),
-                  child: Image.asset('images/android_neutral_rd_na@2x.png')),
+              // GestureDetector(
+              //     onTap: () => signUserInWithGoogle(context),
+              //     child: Image.asset('images/android_neutral_rd_na@2x.png')),
           
               const SizedBox(height: 25),
           

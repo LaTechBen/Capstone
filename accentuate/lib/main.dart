@@ -1,5 +1,6 @@
 import 'package:accentuate/firebase_options.dart';
 import 'package:accentuate/signin_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
@@ -7,6 +8,7 @@ import 'signup_page.dart';
 import 'settings_page.dart';
 import 'search_page.dart';
 import 'createoutfit_page.dart';
+import 'user_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +35,11 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
         ),
-        home: MyHomePage(
-          title: "",
-        )
-
-        // home: SigninPage()
+        // home: MyHomePage(
+        //   title: "",
+        // )
+        // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
+        home: SigninPage()
         //home: CreateOutfitPage()
         );
   }
@@ -62,6 +64,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String? getUid() {
+    if (_auth.currentUser?.uid == null) {
+      // this is the test db entry
+      return 'qtdngM2pXSopCBDgC8zU';
+    }
+    return _auth.currentUser?.uid;
+  }
+
   int currentPage = 0;
   @override
   Widget build(BuildContext context) {
@@ -76,7 +88,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ? SettingsPage()
           : currentPage == 1
               ? SearchPage()
-              : HomePage(),
+              : currentPage == 4
+                  ? UserPage(uid: getUid())
+                  : HomePage(),
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
@@ -144,13 +158,13 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           const Spacer(),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.ondemand_video,
-            ),
-          ),
-          const Spacer(),
+          // IconButton(
+          //   onPressed: () {},
+          //   icon: const Icon(
+          //     Icons.ondemand_video,
+          //   ),
+          // ),
+          // const Spacer(),
           IconButton(
             onPressed: () {
               setState(() {
@@ -163,7 +177,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           const Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                currentPage = 4;
+              });
+            },
             icon: const Icon(
               Icons.person,
             ),
