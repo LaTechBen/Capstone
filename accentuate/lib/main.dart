@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ? SearchPage()
               : currentPage == 4
                   ? UserPage(uid: getUid())
-                  : HomePage(),
+                  : HomePage(uid: getUid()),
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar

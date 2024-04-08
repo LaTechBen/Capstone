@@ -10,6 +10,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'user_page.dart';
 
 class HomePage extends StatefulWidget {
+  // uid id required to know whose profile to show.
+  final String? uid;
+  const HomePage({super.key, required this.uid});
+
   @override
   _HomePageState createState() => _HomePageState();
 
