@@ -3,37 +3,44 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'userPageImageDisplay.dart';
 
-class _PrivateOutfits extends StatefulWidget {
+class PrivateOutfits extends StatefulWidget {
   final String? uid;
-  const _PrivateOutfits({super.key, required this.uid});
+  const PrivateOutfits({super.key, required this.uid});
   
   @override
-  State<_PrivateOutfits> createState() => __PrivateOutfitsState();
+  State<PrivateOutfits> createState() => _PrivateOutfitsState();
 
-  getPrivateOutfits(){
-    
-  }
 }
 
-class __PrivateOutfitsState extends State<_PrivateOutfits> {
+class _PrivateOutfitsState extends State<PrivateOutfits> {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  getPrivateOutfits(){
+    
+  }
+
+  gotoPrivateOutfits(BuildContext context){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => PrivateOutfits(uid: _auth.currentUser?.uid)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('List of Lists of Images'),
+        title: Text('Private Outfits'),
+        leading: null,
       ),
       body: Expanded(
                   child: FutureBuilder(
                     future: _firestore
                         .collection('users')
                         .doc(widget.uid)
-                        .collection('posts')
+                        .collection('outfits')
                         .get(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {

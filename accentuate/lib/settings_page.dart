@@ -41,6 +41,7 @@ class SettingsPage extends StatelessWidget {
             Icon(Icons.settings),
           ],
         ),
+        leading: null,
       ),
       body: const SettingsBody(),
     );

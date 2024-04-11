@@ -38,12 +38,13 @@ class PersonalInfoPage extends StatelessWidget {
             Icon(Icons.person),
           ],
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_outlined),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        leading: null
+        // IconButton(
+        //   icon: const Icon(Icons.arrow_back_outlined),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
       ),
       body: const PersonalInfoList(),
     );

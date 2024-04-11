@@ -95,6 +95,7 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
         ),
+        leading: null,
       ),
       body: Column(
         children: [

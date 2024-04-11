@@ -96,13 +96,15 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
             SizedBox(width: 8),
             Icon(Icons.person),
           ],
+          
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_outlined),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        leading: null,
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back_outlined),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),

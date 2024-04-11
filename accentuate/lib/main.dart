@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Colors.pink),
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
           useMaterial3: true,
+          
         ),
         // home: MyHomePage(
         //   title: "",

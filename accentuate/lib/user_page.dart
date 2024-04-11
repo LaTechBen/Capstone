@@ -1,3 +1,5 @@
+import 'package:accentuate/edit_profile_page.dart';
+import 'package:accentuate/private_outfits.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -81,6 +83,10 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
+  gotoEditProfile(){
+     Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(uid: _auth.currentUser?.uid)));
+  }
+
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
@@ -115,7 +121,7 @@ class _UserPageState extends State<UserPage> {
                                 ),
                                 borderRadius: BorderRadius.circular(5)),
                             child: TextButton(
-                              onPressed: () => {},
+                              onPressed: () => gotoEditProfile(),
                               child: const Text(
                                 'Edit Profile',
                                 style: TextStyle(
@@ -185,6 +191,7 @@ class _UserPageState extends State<UserPage> {
                             ),
                 ],
               ),
+              leading: null,
             ),
             body: ListView(
               children: [

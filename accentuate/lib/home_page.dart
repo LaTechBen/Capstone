@@ -210,6 +210,7 @@ class _HomePageState extends State<HomePage> {
                 "images/logo.png",
                 height: 50,
               ),
+              leading: null,
               actions: [
                 IconButton(
                   onPressed: () {

@@ -84,7 +84,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(leading: null,),
       body: Center(
         child: Column(
           children: [
