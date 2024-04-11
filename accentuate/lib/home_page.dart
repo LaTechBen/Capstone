@@ -48,6 +48,11 @@ class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  // Reference from the users post
+  final postReference = FirebaseFirestore.instance
+      .collection('users/St24OcPlw5ZlxP8YNVKGShzhQPp2/outfits')
+      .orderBy('time', descending: true);
+
   List<String> profileImages = [
     "images/1.jpg",
     "images/2.jpg",
@@ -104,6 +109,44 @@ class _HomePageState extends State<HomePage> {
   // Maintain a list to keep track of the pressed state for each posts
   List<bool> isLiked = List.filled(10, false);
 
+  // Checking if the user already liked the post
+  Future<bool> userLiked(int index) async {
+    // Get the reference to the post collection
+    CollectionReference colRef =
+        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+
+    // Query for documents and get their snapshots
+    QuerySnapshot qss = await colRef.get();
+
+    // Check if the index is within the bounds of retrieved documents
+    if (index >= 0 && index < qss.size) {
+      // Access the document snapshot at the specified index
+      DocumentSnapshot dss = qss.docs[index];
+
+      // Access the data of the document
+      Map<String, dynamic> d = dss.data() as Map<String, dynamic>;
+
+      if (d.containsKey('likes')) {
+        // Access the "likes" field
+        List<dynamic> ulikes = d['likes'];
+
+        // Check if the user's uid is already in the likes array
+        if (ulikes.contains(widget.uid)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    // Ensure a consistent return value if the conditions are not met
+    return false;
+  }
+
+  Future<bool> uLiked(int index) async {
+    return await userLiked(index);
+  }
+
   // Method to handle like button press
   void handleLikeButtonPress(int index) {
     setState(() {
@@ -133,6 +176,142 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+
+  /* NEW LIKE AND COMMENT HANDLER */
+
+  // Method to handle like button press for a specific document by index
+  void likeButtonPress(int index) async {
+    // Get the reference to the post collection
+    CollectionReference postRef =
+        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+
+    try {
+      // Query for documents and get their snapshots
+      QuerySnapshot querySnapshot = await postRef.get();
+
+      // Check if the index is within the bounds of retrieved documents
+      if (index >= 0 && index < querySnapshot.size) {
+        // Access the document snapshot at the specified index
+        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
+
+        // Access the data of the document
+        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+
+        if (data.containsKey('likes')) {
+          // Access the "likes" field
+          List<dynamic> likes = data['likes'];
+
+          // Add the user's UID to the "likes" array if it's not already present
+          if (!likes.contains(widget.uid)) {
+            likes.add(widget.uid);
+            // updating the isLiked array
+            //userLiked[index] = true;
+            // Update the document in Firestore with the modified "likes" array
+            await docSnapshot.reference.update({'likes': likes});
+            print(
+                'User UID added to likes array in document: ${docSnapshot.id}');
+          } else {
+            print(
+                'User UID already exists in likes array in document: ${docSnapshot.id}');
+          }
+        } else {
+          // Handle the case where the document does not contain the "likes" field
+          print('Document does not contain the "likes" field');
+        }
+      } else {
+        print('Invalid index: $index');
+      }
+    } catch (e) {
+      print('Error liking post: $e');
+    }
+  }
+
+  // Method to handle unlike button press for a specific document by index
+  void unlikeButtonPress(int index) async {
+    // Get the reference to the post collection
+    CollectionReference postRef =
+        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+
+    try {
+      // Query for documents and get their snapshots
+      QuerySnapshot querySnapshot = await postRef.get();
+
+      // Check if the index is within the bounds of retrieved documents
+      if (index >= 0 && index < querySnapshot.size) {
+        // Access the document snapshot at the specified index
+        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
+
+        // Access the data of the document
+        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+
+        if (data.containsKey('likes')) {
+          // Access the "likes" field
+          List<dynamic> likes = data['likes'];
+
+          // Remove the user's UID from the "likes" array if it's present
+          if (likes.contains(widget.uid)) {
+            likes.remove(widget.uid);
+            likeCounts[index]! - 1;
+
+            // Update the document in Firestore with the modified "likes" array
+            await docSnapshot.reference.update({'likes': likes});
+            print(
+                'User UID removed from likes array in document: ${docSnapshot.id}');
+          } else {
+            print(
+                'User UID does not exist in likes array in document: ${docSnapshot.id}');
+          }
+        } else {
+          // Handle the case where the document does not contain the "likes" field
+          print('Document does not contain the "likes" field');
+        }
+      } else {
+        print('Invalid index: $index');
+      }
+    } catch (e) {
+      print('Error unliking post: $e');
+    }
+  }
+
+  // Method to handle adding a comment to a specific document by index
+  void commentButtonPress(int index, String commentText) async {
+    // Get the reference to the post collection
+    CollectionReference postRef =
+        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+
+    try {
+      // Query for documents and get their snapshots
+      QuerySnapshot querySnapshot = await postRef.get();
+
+      // Check if the index is within the bounds of retrieved documents
+      if (index >= 0 && index < querySnapshot.size) {
+        // Access the document snapshot at the specified index
+        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
+
+        // Access the data of the document
+        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+
+        // Access the "comments" field
+        List<dynamic> comments = data['comments'];
+
+        // Add the user's comment along with their UID to the "comments" array
+        comments.add({
+          'uid': widget.uid,
+          'comment': commentText, // The text of the user's comment
+        });
+
+        // Update the document in Firestore with the modified "comments" array
+        await docSnapshot.reference.update({'comments': comments});
+
+        print('Comment added successfully to document: ${docSnapshot.id}');
+      } else {
+        print('Invalid index: $index');
+      }
+    } catch (e) {
+      print('Error adding comment: $e');
+    }
+  }
+  /* ENDS HERE */
 
   Future<void> onRefresh() async {
     await Future.delayed(Duration(seconds: 1));
@@ -164,6 +343,49 @@ class _HomePageState extends State<HomePage> {
     postUrls = [];
     // Retrieve the image from Firebase Storage
     getImageUrl();
+    // Fetch like counts and comments from Firestore
+    fetchLikeCountsAndComments();
+  }
+
+  // Method to fetch like counts and comments from Firestore
+  void fetchLikeCountsAndComments() async {
+    try {
+      // Get the reference to the post collection
+      CollectionReference postRef =
+          FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+
+      // Retrieve all documents within the collection
+      QuerySnapshot querySnapshot = await postRef.get();
+
+      // Iterate over the documents within the collection
+      for (int index = 0; index < querySnapshot.docs.length; index++) {
+        // Access the document snapshot at the current index
+        DocumentSnapshot doc = querySnapshot.docs[index];
+
+        // Access the data of each document
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Calculate the size of the 'likes' array
+        int likesCount =
+            data.containsKey('likes') ? (data['likes'] as List).length : 0;
+
+        // Store the like count in the likeCounts map with the index as the key
+        likeCounts[index] = likesCount;
+
+        // Retrieve comments for the current post
+        List<String> comments = data.containsKey('comments')
+            ? List<String>.from(data['comments'])
+            : [];
+
+        // Store comments for the current post in the commentsMap with the index as the key
+        commentsMap[index] = comments;
+      }
+
+      // Update the UI to reflect the changes
+      setState(() {});
+    } catch (e) {
+      print('Error fetching like counts and comments: $e');
+    }
   }
 
   late List<String> postUrls;
@@ -316,6 +538,9 @@ class _HomePageState extends State<HomePage> {
                               IconButton(
                                 onPressed: () {
                                   handleLikeButtonPress(index);
+                                  isLiked[index]
+                                      ? likeButtonPress(index)
+                                      : unlikeButtonPress(index);
                                 },
                                 icon: Icon(
                                   isLiked[index]
@@ -351,6 +576,18 @@ class _HomePageState extends State<HomePage> {
                                               // Handle adding a comment
                                               handleCommentButtonPress(index);
                                               Navigator.of(context).pop();
+                                              // Ensure commentsMap[index] is not null before adding the comment
+                                              commentsMap[index] ??= [];
+                                              List<String>? comment =
+                                                  commentsMap[index];
+                                              if (comment != null) {
+                                                for (var com in comment) {
+                                                  commentButtonPress(
+                                                      index, com);
+                                                }
+                                              }
+
+                                              //commentButtonPress(index, commentsMap[index]);
                                             },
                                             child: Text('Add'),
                                           ),
