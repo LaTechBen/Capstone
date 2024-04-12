@@ -371,14 +371,36 @@ class _HomePageState extends State<HomePage> {
 
         // Store the like count in the likeCounts map with the index as the key
         likeCounts[index] = likesCount;
+        if (likeCounts[index] != 0) {
+          isLiked[index] = true;
+        }
 
         // Retrieve comments for the current post
-        List<String> comments = data.containsKey('comments')
-            ? List<String>.from(data['comments'])
-            : [];
+        List<dynamic> commentsData =
+            data.containsKey('comments') ? data['comments'] : [];
+        List<String> commentTexts = [];
+
+// Iterate over each comment data and extract the comment text
+        for (var commentData in commentsData) {
+          if (commentData is Map<String, dynamic> &&
+              commentData.containsKey('comment')) {
+            commentTexts.add(commentData['comment'] as String);
+          }
+        }
+
+// Store comments for the current post in the commentsMap with the index as the key
+        commentsMap[index] = commentTexts;
+
+        // Retrieve comments for the current post
+        // List<Map<String, dynamic>> comments = data.containsKey('comments')
+        //     ? (data['comments'] as List<dynamic>).cast<Map<String, dynamic>>()
+        //     : [];
+
+        // Extract just the 'comment' field from each map
+        //List<String> commentTexts = comments.map((comment) => comment['comment']).toList();
 
         // Store comments for the current post in the commentsMap with the index as the key
-        commentsMap[index] = comments;
+        //commentsMap[index] = comments.map((comment) => comment['comment']).toList();
       }
 
       // Update the UI to reflect the changes
