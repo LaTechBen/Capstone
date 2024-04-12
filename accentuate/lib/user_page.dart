@@ -1,4 +1,6 @@
+
 import 'package:accentuate/edit_profile_page.dart';
+import 'package:accentuate/followers_page.dart';
 import 'package:accentuate/private_outfits.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,6 +36,8 @@ class _UserPageState extends State<UserPage> {
   bool testing = false;
   double screenWidth = 0;
   double screenHeight = 0;
+  
+
 
   @override
   void initState() {
@@ -90,6 +94,44 @@ class _UserPageState extends State<UserPage> {
 
   gotoEditProfile(BuildContext context){
      Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(uid: _auth.currentUser?.uid)));
+  }
+
+  unFollowProfile(String? uid) async {
+    try{
+    var currUserSnap = await _firestore.collection("users").doc(_auth.currentUser?.uid).get();
+    var otherProfileSnap = await _firestore.collection("users").doc(uid).get();
+    List following = ((currUserSnap.data()!["following"] ?? []) as List);
+    List followers = ((otherProfileSnap.data()!["followers"] ?? []) as List);
+    following.remove(uid);
+    followers.remove(_auth.currentUser?.uid);
+    print("UNFOLLOW " + following.toString());
+    print("UNFOLLOW " + followers.toString());
+    _firestore.collection("users").doc(_auth.currentUser?.uid).update({"following" : following});
+    _firestore.collection("users").doc(uid).update({"followers" : followers});
+        } catch (error){
+      print(error.toString());
+    }
+  }
+
+  followProfile(String? uid) async {
+    try{
+    var currUserSnap = await _firestore.collection("users").doc(_auth.currentUser?.uid).get();
+    var otherProfileSnap = await _firestore.collection("users").doc(uid).get();
+    List following = ((currUserSnap.data()!["following"] ?? []) as List);
+    List followers = ((otherProfileSnap.data()!["followers"] ?? []) as List);
+    following.add(uid);
+    followers.add(_auth.currentUser?.uid);
+    print("FOLLOW: " + following.toString());
+    print("FOLLOW: " + followers.toString());
+    _firestore.collection("users").doc(_auth.currentUser?.uid).update({"following" : following});
+    _firestore.collection("users").doc(uid).update({"followers" : followers});
+    } catch (error){
+      print(error.toString());
+    }
+  }
+
+  goToFollowersPage(BuildContext context){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => FollowersPage(uid: widget.uid)));
   }
 
   @override
@@ -153,6 +195,7 @@ class _UserPageState extends State<UserPage> {
                                   onPressed: () => setState(
                                     () {
                                       isFollowing = !isFollowing;
+                                      unFollowProfile(widget.uid);
                                     },
                                   ),
                                   child: const Text(
@@ -181,6 +224,7 @@ class _UserPageState extends State<UserPage> {
                                   onPressed: () => setState(
                                     () {
                                       isFollowing = !isFollowing;
+                                      followProfile(widget.uid);
                                     },
                                   ),
                                   child: const Text(
@@ -290,31 +334,38 @@ class _UserPageState extends State<UserPage> {
           );
   }
 
-  Column statColumn(int stat, String statLabel) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          NumberFormat.compact().format(stat),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        //Followers
-        Container(
-          margin: const EdgeInsets.only(top: 5),
-          child: Text(
-            statLabel,
+  GestureDetector statColumn(int stat, String statLabel) {
+    return GestureDetector(
+      onTap: () => {
+
+        goToFollowersPage(context)
+      
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            NumberFormat.compact().format(stat),
             style: const TextStyle(
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
             ),
           ),
-        ),
-      ],
+          //Followers
+          Container(
+            margin: const EdgeInsets.only(top: 5),
+            child: Text(
+              statLabel,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
