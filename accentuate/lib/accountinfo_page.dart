@@ -38,16 +38,27 @@ class AccountInfoPage extends StatefulWidget {
 }
 
 class _AccountInfoPageState extends State<AccountInfoPage> {
+  late HomePage _homePage;
+
+  String? getUid() {
+    if (_auth.currentUser?.uid == null) {
+      // this is the test db entry
+      return 'qtdngM2pXSopCBDgC8zU';
+    }
+    return _auth.currentUser?.uid;
+  }
+
   File selectedImage = File('');
   final Write _write = Write();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
-  final HomePage _homePage = HomePage();
+  //final HomePage _homePage = HomePage(uid: getUid());
   var userdata = {};
 
   @override
   void initState() {
     super.initState();
+    _homePage = HomePage(uid: getUid());
     getData();
   }
 

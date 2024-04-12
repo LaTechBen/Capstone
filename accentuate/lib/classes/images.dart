@@ -4,6 +4,7 @@ class Images {
   final DateTime datePublished;
   final String description;
   final likes;
+  final comments;
   final String postID;
   final List<String> postUrl;
   final String uid;
@@ -13,6 +14,7 @@ class Images {
       {required this.datePublished,
       required this.description,
       required this.likes,
+      required this.comments,
       required this.postID,
       required this.postUrl,
       required this.uid,
@@ -25,6 +27,7 @@ class Images {
         datePublished: snapshot["datePublished"],
         description: snapshot["description"],
         likes: snapshot["likes"],
+        comments: snapshot["comments"],
         postID: snapshot["postID"],
         postUrl: snapshot["postUrl"],
         uid: snapshot["uid"],
@@ -35,6 +38,7 @@ class Images {
         "datePublished": datePublished,
         "description": description,
         "likes": likes,
+        "comments": comments,
         "postID": postID,
         "postUrl": postUrl,
         "uid": uid,

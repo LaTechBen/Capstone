@@ -25,22 +25,21 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   var userdata = {};
   ImagePicker imagePicker = ImagePicker();
   List<XFile> imageFileList = [];
-  
+  late HomePage _homePage;
 
   @override
   void initState() {
     super.initState();
+    _homePage = HomePage(uid: getUid());
     getData();
   }
 
   void selectedImages() async {
     final List<XFile> selectedImages = await imagePicker.pickMultiImage();
-    if(selectedImages.isNotEmpty){
+    if (selectedImages.isNotEmpty) {
       imageFileList.addAll(selectedImages);
     }
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   getData() async {
@@ -49,8 +48,16 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
     userdata = userSnap.data()!;
   }
 
+  String? getUid() {
+    if (_auth.currentUser?.uid == null) {
+      // this is the test db entry
+      return 'qtdngM2pXSopCBDgC8zU';
+    }
+    return _auth.currentUser?.uid;
+  }
+
   File selectedImage = File('');
-  final HomePage _homePage = HomePage();
+  //final HomePage _homePage = HomePage(uid: getUid());
 
   setGalleryImage() async {
     try {
@@ -69,7 +76,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
 
   List<File> convertXFileToFile(List<XFile> files) {
     List<File> output = [];
-    for(XFile file in files){
+    for (XFile file in files) {
       output.add(File(file.path));
     }
     return output;
@@ -77,8 +84,10 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
 
   storeImages(bool isPost) async {
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Outfit saved.")));
-    await _write.uploadImages(convertXFileToFile(imageFileList), isPost ,_auth.currentUser!.uid, userdata['username'], 'Description');
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("Outfit saved.")));
+    await _write.uploadImages(convertXFileToFile(imageFileList), isPost,
+        _auth.currentUser!.uid, userdata['username'], 'Description');
   }
 
   @override
@@ -88,39 +97,65 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
       body: Center(
         child: Column(
           children: [
-            Expanded(child: Padding(
+            Expanded(
+                child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-                itemCount: imageFileList.length, 
-                itemBuilder: (BuildContext context, int index) { 
-                  return Image.file(File(imageFileList[index].path), fit: BoxFit.cover,);
-                  },
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3),
+                itemCount: imageFileList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Image.file(
+                    File(imageFileList[index].path),
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             )),
-            const SizedBox(height: 10.0,),
-            (
-            MyButton(text: "Save Outfit", onTap: () => {
-              if(imageFileList.isEmpty){
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select pictures to save.")))
-              }
-              else
-              showDialog(context: context, builder: (context) => AlertDialog(
-                actions: [
-                  TextButton(onPressed: () {storeImages(false); Navigator.of(context).pop();}, 
-                    child: const Text("No")), 
-                  TextButton(onPressed: () {storeImages(true); Navigator.of(context).pop();}, 
-                    child: const Text("Yes"))
-                ],
-                title: const Text("Make Outfit Public?"),
-                contentPadding: const EdgeInsets.all(15.0),
-                content: const Text("Would you like to save your outfit as a post to be made public?"),
-              ))
-            })
+            const SizedBox(
+              height: 10.0,
             ),
-            const SizedBox(height: 10.0,),
+            (MyButton(
+                text: "Save Outfit",
+                onTap: () => {
+                      if (imageFileList.isEmpty)
+                        {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("Please select pictures to save.")))
+                        }
+                      else
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          storeImages(false);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text("No")),
+                                    TextButton(
+                                        onPressed: () {
+                                          storeImages(true);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text("Yes"))
+                                  ],
+                                  title: const Text("Make Outfit Public?"),
+                                  contentPadding: const EdgeInsets.all(15.0),
+                                  content: const Text(
+                                      "Would you like to save your outfit as a post to be made public?"),
+                                ))
+                    })),
+            const SizedBox(
+              height: 10.0,
+            ),
             MyButton(text: "Choose Pictures", onTap: selectedImages),
-            const SizedBox(height: 10.0,)
+            const SizedBox(
+              height: 10.0,
+            )
           ],
         ),
       ),
