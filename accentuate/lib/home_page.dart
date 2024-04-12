@@ -409,13 +409,6 @@ class _HomePageState extends State<HomePage> {
           // Generate a unique document ID for a sample post document
           String postId =
               FirebaseFirestore.instance.collection('posts').doc().id;
-
-          // Create a sample post document within the 'posts' subcollection
-          batch.set(postsCollection.doc(postId), {
-            'title': 'Sample Post',
-            'content': 'This is a sample post.',
-            'timestamp': FieldValue.serverTimestamp(),
-          });
         }
       }
 
@@ -508,50 +501,30 @@ class _HomePageState extends State<HomePage> {
       // Get all documents from the 'posts' subcollection
       QuerySnapshot postsSnapshot = await postsCollection.get();
 
-      // Extract image URLs from the documents
-      List<String> urls = postsSnapshot.docs.map((doc) {
-        // Assuming each document has a field named 'imageUrl' containing the image URL
-        return doc['postUrl'] as String; // Adjust field name if necessary
-      }).toList();
+      if (postsSnapshot.docs.isNotEmpty) {
+        // Extract image URLs from the documents
+        List<String> urls = postsSnapshot.docs.map((doc) {
+          // Assuming each document has a field named 'imageUrl' containing the image URL
+          return doc['postUrl'] as String; // Adjust field name if necessary
+        }).toList();
 
-      setState(() {
-        postUrls = urls;
-        isLoading = false;
-      });
+        setState(() {
+          postUrls = urls;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          // No documents found, set postUrls to an empty list
+          postUrls = [];
+          isLoading = false;
+        });
+      }
     } catch (e) {
       print('Error getting image URLs: $e');
       setState(() {
         isLoading = false;
       });
     }
-
-    // setState(() {
-    //   isLoading = true;
-    // });
-    // // Get the reference to the image file in Firebase Storage
-    // final Reference ref =
-    //     //storage.ref().child('posts/St24OcPlw5ZlxP8YNVKGShzhQPp2');
-    //     storage.ref().child('outfits/St24OcPlw5ZlxP8YNVKGShzhQPp2');
-    // final ListResult result = await ref.listAll();
-    // final List<String> urls = [];
-
-    // final profileRef =
-    //     storage.ref().child('profiles/St24OcPlw5ZlxP8YNVKGShzhQPp2');
-    // final Purl = await profileRef.getDownloadURL();
-    // // Iterate through the items and fetch download URLs for image files
-    // await Future.forEach(result.items, (Reference reference) async {
-    //   // Check if the item is an image file (you can add more file extensions if needed)
-    //   final String url = await reference.getDownloadURL();
-    //   urls.add(url);
-    //   // print the URL for debugging
-    //   print('Download URL: $url');
-    // });
-    // // Get then imageUrl to download URL
-    // setState(() {
-    //   postUrls = urls;
-    //   profileUrl = Purl;
-    //   isLoading = false;
-    // });
   }
 
   late String imageUrl = '';
