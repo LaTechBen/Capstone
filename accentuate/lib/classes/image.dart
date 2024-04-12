@@ -4,19 +4,22 @@ class Image {
   final DateTime datePublished;
   final String description;
   final likes;
+  final comments;
   final String postID;
   final String postUrl;
   final String uid;
   final String username;
 
-  const Image(
-      {required this.datePublished,
-      required this.description,
-      required this.likes,
-      required this.postID,
-      required this.postUrl,
-      required this.uid,
-      required this.username});
+  const Image({
+    required this.datePublished,
+    required this.description,
+    required this.likes,
+    required this.comments,
+    required this.postID,
+    required this.postUrl,
+    required this.uid,
+    required this.username,
+  });
 
   static Image fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
@@ -25,6 +28,7 @@ class Image {
         datePublished: snapshot["datePublished"],
         description: snapshot["description"],
         likes: snapshot["likes"],
+        comments: snapshot["comments"],
         postID: snapshot["postID"],
         postUrl: snapshot["postUrl"],
         uid: snapshot["uid"],

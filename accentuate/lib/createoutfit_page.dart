@@ -27,11 +27,13 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   ImagePicker imagePicker = ImagePicker();
   List<XFile> imageFileList = [];
   XFile? image;
-  
+  late HomePage _homePage;
+
 
   @override
   void initState() {
     super.initState();
+    _homePage = HomePage(uid: getUid());
     getData();
   }
 
@@ -45,6 +47,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
     setState(() {
       
     });
+
   }
 
   getData() async {
@@ -53,8 +56,16 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
     userdata = userSnap.data()!;
   }
 
+  String? getUid() {
+    if (_auth.currentUser?.uid == null) {
+      // this is the test db entry
+      return 'qtdngM2pXSopCBDgC8zU';
+    }
+    return _auth.currentUser?.uid;
+  }
+
   File selectedImage = File('');
-  final HomePage _homePage = HomePage();
+  //final HomePage _homePage = HomePage(uid: getUid());
 
   setGalleryImage() async {
     try {
@@ -73,7 +84,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
 
   List<File> convertXFilesToFiles(List<XFile> files) {
     List<File> output = [];
-    for(XFile file in files){
+    for (XFile file in files) {
       output.add(File(file.path));
     }
     return output;
@@ -85,8 +96,10 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
 
   storeImages(bool isPost) async {
     Navigator.of(context).pop();
+
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Outfit saved.")));
     await _write.uploadImages(convertXFilesToFiles(imageFileList), isPost ,_auth.currentUser!.uid, userdata['username'], 'Description');
+
   }
 
   @override
@@ -128,10 +141,13 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
                 content: const Text("Would you like to save your outfit to your private or public collection."),
               ))
             })
+            const SizedBox(
+              height: 10.0,
             ),
-            const SizedBox(height: 10.0,),
             MyButton(text: "Choose Pictures", onTap: selectedImages),
-            const SizedBox(height: 10.0,)
+            const SizedBox(
+              height: 10.0,
+            )
           ],
         ),
       ),

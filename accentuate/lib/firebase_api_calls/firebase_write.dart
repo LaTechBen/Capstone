@@ -16,6 +16,33 @@ class Write {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Update Function
+  Future<void> updateExistingDocuments(String uid) async {
+    try {
+      // Retrieve all documents from the collection
+      QuerySnapshot querySnapshot = (await _firebase
+          .collection('users')
+          .doc(uid)
+          .get()) as QuerySnapshot<Object?>;
+
+      // Iterate through each document and update it
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        var docData = doc.data() as Map<String, dynamic>;
+        // Check if the document already has the 'comments' field
+        if (docData != null && docData.containsKey('comments')) {
+          // Update the document to add the 'comments' field
+          await _firebase.collection('users').doc(doc.id).update({
+            'comments': [], // You can set an empty array or any initial value
+          });
+        }
+      }
+
+      print('Updated documents successfully.');
+    } catch (e) {
+      print('Error updating documents: $e');
+    }
+  }
+
   Future<String> storeImage(String childname, File file, bool isPost) async {
     Reference ref =
         _storage.ref().child(childname).child(_auth.currentUser!.uid);
@@ -34,17 +61,16 @@ class Write {
 
   Future<List<String>> storeImages(List<File> files, bool isPost) async {
     Reference ref;
-    if(isPost){
-    ref = _storage.ref().child('posts').child(_auth.currentUser!.uid);
-    }
-    else{
+    if (isPost) {
+      ref = _storage.ref().child('posts').child(_auth.currentUser!.uid);
+    } else {
       ref = _storage.ref().child('outfits').child(_auth.currentUser!.uid);
     }
 
     List<String> fileUrls = [];
 
-    try{
-      for (File file in files){
+    try {
+      for (File file in files) {
         String id = const Uuid().v1();
         ref = ref.child(id);
         final uploadTask = ref.putFile(file);
@@ -52,11 +78,10 @@ class Write {
         String downloadUrl = await snapshot.ref.getDownloadURL();
         fileUrls.add(downloadUrl);
       }
-    }
-    catch (error){
+    } catch (error) {
       throw Exception("There was a problem with storing the images.");
     }
-      return fileUrls;
+    return fileUrls;
   }
 
   Future<String> uploadImage(
@@ -96,6 +121,7 @@ class Write {
           datePublished: DateTime.now(),
           description: description,
           likes: [],
+          comments: [],
           postID: postID,
           postUrl: photoUrl,
           uid: uid,
@@ -191,36 +217,36 @@ class Write {
     try {
       List<String> photoUrl;
 
-        photoUrl = await storeImages(images, false);
+      photoUrl = await storeImages(images, false);
 
-        String postID = const Uuid().v1();
+      String postID = const Uuid().v1();
 
-        Images img = Images(
-          datePublished: DateTime.now(),
-          description: description,
-          likes: [],
-          postID: postID,
-          postUrl: photoUrl,
-          uid: uid,
-          username: username,
-        );
-        if(isPost){
-          _firebase
+      Images img = Images(
+        datePublished: DateTime.now(),
+        description: description,
+        likes: [],
+        comments: [],
+        postID: postID,
+        postUrl: photoUrl,
+        uid: uid,
+        username: username,
+      );
+      if (isPost) {
+        _firebase
             .collection('users')
             .doc(uid)
             .collection("posts")
             .doc(postID)
             .set(img.toJson());
-        }
-        else{
-          _firebase
+      } else {
+        _firebase
             .collection('users')
             .doc(uid)
             .collection("outfits")
             .doc(postID)
             .set(img.toJson());
-        }
-      
+      }
+
       response = "Success!";
     } catch (error) {
       response = error.toString();
