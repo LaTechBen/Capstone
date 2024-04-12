@@ -499,30 +499,59 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       isLoading = true;
     });
-    // Get the reference to the image file in Firebase Storage
-    final Reference ref =
-        //storage.ref().child('posts/St24OcPlw5ZlxP8YNVKGShzhQPp2');
-        storage.ref().child('outfits/St24OcPlw5ZlxP8YNVKGShzhQPp2');
-    final ListResult result = await ref.listAll();
-    final List<String> urls = [];
 
-    final profileRef =
-        storage.ref().child('profiles/St24OcPlw5ZlxP8YNVKGShzhQPp2');
-    final Purl = await profileRef.getDownloadURL();
-    // Iterate through the items and fetch download URLs for image files
-    await Future.forEach(result.items, (Reference reference) async {
-      // Check if the item is an image file (you can add more file extensions if needed)
-      final String url = await reference.getDownloadURL();
-      urls.add(url);
-      // print the URL for debugging
-      print('Download URL: $url');
-    });
-    // Get then imageUrl to download URL
-    setState(() {
-      postUrls = urls;
-      profileUrl = Purl;
-      isLoading = false;
-    });
+    try {
+      // Get reference to the Firestore collection
+      CollectionReference postsCollection = FirebaseFirestore.instance.collection(
+          'users/${widget.uid}/posts'); // Adjust path to your 'posts' subcollection
+
+      // Get all documents from the 'posts' subcollection
+      QuerySnapshot postsSnapshot = await postsCollection.get();
+
+      // Extract image URLs from the documents
+      List<String> urls = postsSnapshot.docs.map((doc) {
+        // Assuming each document has a field named 'imageUrl' containing the image URL
+        return doc['postUrl'] as String; // Adjust field name if necessary
+      }).toList();
+
+      setState(() {
+        postUrls = urls;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error getting image URLs: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+
+    // setState(() {
+    //   isLoading = true;
+    // });
+    // // Get the reference to the image file in Firebase Storage
+    // final Reference ref =
+    //     //storage.ref().child('posts/St24OcPlw5ZlxP8YNVKGShzhQPp2');
+    //     storage.ref().child('outfits/St24OcPlw5ZlxP8YNVKGShzhQPp2');
+    // final ListResult result = await ref.listAll();
+    // final List<String> urls = [];
+
+    // final profileRef =
+    //     storage.ref().child('profiles/St24OcPlw5ZlxP8YNVKGShzhQPp2');
+    // final Purl = await profileRef.getDownloadURL();
+    // // Iterate through the items and fetch download URLs for image files
+    // await Future.forEach(result.items, (Reference reference) async {
+    //   // Check if the item is an image file (you can add more file extensions if needed)
+    //   final String url = await reference.getDownloadURL();
+    //   urls.add(url);
+    //   // print the URL for debugging
+    //   print('Download URL: $url');
+    // });
+    // // Get then imageUrl to download URL
+    // setState(() {
+    //   postUrls = urls;
+    //   profileUrl = Purl;
+    //   isLoading = false;
+    // });
   }
 
   late String imageUrl = '';
@@ -621,14 +650,16 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   child: CircleAvatar(
                                     radius: 12,
-                                    backgroundImage: NetworkImage(
-                                        profileUrl), //AssetImage("images/test.jpg"
+                                    backgroundImage: NetworkImage(userData[
+                                        'profileImage']), //AssetImage("images/test.jpg"
                                     //     //profileImages[index],
                                     //     ),
                                   ),
                                 ),
                               ),
-                              Text("samsamsam"),
+                              Text(
+                                userData['username'],
+                              ),
                               Spacer(),
                               IconButton(
                                 onPressed: () {},
@@ -770,8 +801,8 @@ class _HomePageState extends State<HomePage> {
                                                         .style,
                                                 children: [
                                                   TextSpan(
-                                                    text:
-                                                        'samsamsam', // Assuming "Profile name" is the user name
+                                                    text: userData[
+                                                        'username'], // Assuming "Profile name" is the user name
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold),

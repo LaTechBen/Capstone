@@ -83,13 +83,18 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
-
-  gotoPrivateOutfits(BuildContext context){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => PrivateOutfits(uid: _auth.currentUser?.uid)));
+  gotoPrivateOutfits(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PrivateOutfits(uid: _auth.currentUser?.uid)));
   }
 
-  gotoEditProfile(BuildContext context){
-     Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(uid: _auth.currentUser?.uid)));
+  gotoEditProfile(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EditProfile(uid: _auth.currentUser?.uid)));
   }
 
   @override
