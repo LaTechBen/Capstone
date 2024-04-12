@@ -123,7 +123,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
             )
             ),
             const SizedBox(height: 10.0,),
-            (
+            
             MyButton(text: "Save Outfit", onTap: () => {
               if(image == null){
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select pictures to save.")))
@@ -140,7 +140,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
                 contentPadding: const EdgeInsets.all(15.0),
                 content: const Text("Would you like to save your outfit to your private or public collection."),
               ))
-            })
+            }),
             const SizedBox(
               height: 10.0,
             ),

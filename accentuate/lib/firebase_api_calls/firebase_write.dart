@@ -183,7 +183,7 @@ class Write {
           postID: postID,
           postUrl: photoUrl,
           uid: uid,
-          username: username,
+          username: username, comments: [],
         );
         if(isPost){
           _firebase
@@ -270,7 +270,7 @@ class Write {
   moveOutfitToPublicOrPrivate(String uid, DocumentSnapshot image, String previousLocation, String newLocation){
     Timestamp timestamp = image["datePublished"];
     DateTime time = timestamp.toDate();
-    Image newImage = Image(datePublished: time, description: image["description"] , likes: image["likes"], postID: image["postID"], postUrl: image["postUrl"], uid: image["uid"], username: image["username"]);
+    Image newImage = Image(datePublished: time, description: image["description"] , likes: image["likes"], comments: image["comments"], postID: image["postID"], postUrl: image["postUrl"], uid: image["uid"], username: image["username"]);
     try {
     _firebase.collection('users')
     .doc(uid)
