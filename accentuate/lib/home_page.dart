@@ -343,6 +343,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> onRefresh() async {
     await Future.delayed(Duration(seconds: 1));
+
+    // Fetch like counts and comments from Firestore
+    fetchLikeCountsAndComments();
   }
 
   File? _selectedImage;
