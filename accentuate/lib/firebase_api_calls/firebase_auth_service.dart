@@ -16,8 +16,9 @@ class FirebaseAuthService {
       await _auth.currentUser?.sendEmailVerification().then((value) => {
         _firebase.collection('users').doc(credential.user?.uid).set({
           "username": username,
-          "following": []
-        })
+          "following": [],
+          "followers": [],
+       })
       });
       return credential.user;
     } catch (e){

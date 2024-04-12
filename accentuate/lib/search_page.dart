@@ -1,3 +1,8 @@
+import 'dart:developer';
+
+import 'package:accentuate/user_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:string_similarity/string_similarity.dart';
@@ -11,6 +16,8 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
   late Future<List<DocumentSnapshot>> _trendingPosts;
   Future<List<DocumentSnapshot>>? _searchPostResults;
   Future<List<DocumentSnapshot>>? _searchUserResults;
@@ -78,6 +85,13 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       _currentView = view;
     });
+  }
+
+    goToUserPage(BuildContext context, DocumentSnapshot<Object?> uid){
+    String userUid = uid.reference.id;
+    log("HERE");
+    log(userUid);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => UserPage(uid: userUid)));
   }
 
   // Format and UI Elements
@@ -200,7 +214,8 @@ class _SearchPageState extends State<SearchPage> {
                                 // Handle Null 'username'
                                 var username = (users[index].data() as Map<String, dynamic>?)?['username'] ?? ''; 
                                 return ListTile(
-                                  title: Text(username),                                 
+                                  title: Text(username),
+                                  onTap: () => goToUserPage(context, users[index]),                               
                                 );
                               },
                             );
