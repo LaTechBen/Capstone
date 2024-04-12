@@ -38,6 +38,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var userData = {};
+
   bool isLoading = false;
 
   // Get a reference to storage root
@@ -48,9 +50,35 @@ class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  // Reference to the user
+  Future<String> findUserDocumentByUsername(String username) async {
+    try {
+      final userReference = FirebaseFirestore.instance.collection('users');
+
+      // Query the collection to find documents where the 'username' field matches the desiredUsername
+      QuerySnapshot querySnapshot =
+          await userReference.where('username', isEqualTo: username).get();
+
+      // Check if any documents were found
+      if (querySnapshot.docs.isNotEmpty) {
+        // Access the first document that matches the query
+        DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+        // Access the 'uid' field from the document snapshot and return it
+        return documentSnapshot.get('uid') as String;
+      } else {
+        // No document found with the given username
+        return 'User not found';
+      }
+    } catch (e) {
+      // Error occurred
+      print('Error finding user document: $e');
+      return 'Error';
+    }
+  }
+
   // Reference from the users post
   final postReference = FirebaseFirestore.instance
-      .collection('users/St24OcPlw5ZlxP8YNVKGShzhQPp2/outfits')
+      .collection('users/St24OcPlw5ZlxP8YNVKGShzhQPp2/posts')
       .orderBy('time', descending: true);
 
   List<String> profileImages = [
@@ -113,7 +141,7 @@ class _HomePageState extends State<HomePage> {
   Future<bool> userLiked(int index) async {
     // Get the reference to the post collection
     CollectionReference colRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
 
     // Query for documents and get their snapshots
     QuerySnapshot qss = await colRef.get();
@@ -183,7 +211,7 @@ class _HomePageState extends State<HomePage> {
   void likeButtonPress(int index) async {
     // Get the reference to the post collection
     CollectionReference postRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
 
     try {
       // Query for documents and get their snapshots
@@ -230,7 +258,7 @@ class _HomePageState extends State<HomePage> {
   void unlikeButtonPress(int index) async {
     // Get the reference to the post collection
     CollectionReference postRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
 
     try {
       // Query for documents and get their snapshots
@@ -277,7 +305,7 @@ class _HomePageState extends State<HomePage> {
   void commentButtonPress(int index, String commentText) async {
     // Get the reference to the post collection
     CollectionReference postRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
 
     try {
       // Query for documents and get their snapshots
@@ -350,9 +378,56 @@ class _HomePageState extends State<HomePage> {
   // Method to fetch like counts and comments from Firestore
   void fetchLikeCountsAndComments() async {
     try {
+      // getting reference to the profileImage
+      var userSnap = await _firestore.collection('users').doc(widget.uid).get();
+
+      userData = userSnap.data()!;
+
+      // adding 'posts' as a subcollection to each user
+
+      // Get a reference to the 'users' collection
+      CollectionReference usersCollection =
+          FirebaseFirestore.instance.collection('users');
+
+      // Get all documents from the 'users' collection
+      QuerySnapshot usersSnapshot = await usersCollection.get();
+
+      // Create a batched write operation
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+
+      // Iterate through each document in the 'users' collection
+      for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
+        // Get the reference to the 'posts' subcollection for the current user
+        CollectionReference postsCollection =
+            userDoc.reference.collection('posts');
+
+        // Check if the 'posts' subcollection exists
+        QuerySnapshot postsSnapshot = await postsCollection.limit(1).get();
+
+        // If the 'posts' subcollection doesn't exist, create it
+        if (postsSnapshot.docs.isEmpty) {
+          // Generate a unique document ID for a sample post document
+          String postId =
+              FirebaseFirestore.instance.collection('posts').doc().id;
+
+          // Create a sample post document within the 'posts' subcollection
+          batch.set(postsCollection.doc(postId), {
+            'title': 'Sample Post',
+            'content': 'This is a sample post.',
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+
+      // Commit the batched write operation
+      await batch.commit();
+
+      print('Subcollections created successfully.');
+
+      // ENDS HERE
       // Get the reference to the post collection
       CollectionReference postRef =
-          FirebaseFirestore.instance.collection('users/${widget.uid}/outfits');
+          FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
 
       // Retrieve all documents within the collection
       QuerySnapshot querySnapshot = await postRef.get();
@@ -364,6 +439,14 @@ class _HomePageState extends State<HomePage> {
 
         // Access the data of each document
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Ensure the document contains the "comments" field and it's an array
+        if (!data.containsKey('comments') || !(data['comments'] is List)) {
+          // Add a new empty "comments" array to the document
+          await doc.reference.update({'comments': []});
+          // Update the data variable to include the empty "comments" array
+          data['comments'] = [];
+        }
 
         // Calculate the size of the 'likes' array
         int likesCount =
