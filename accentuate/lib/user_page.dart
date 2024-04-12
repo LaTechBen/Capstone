@@ -1,3 +1,5 @@
+import 'package:accentuate/edit_profile_page.dart';
+import 'package:accentuate/private_outfits.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -81,6 +83,15 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
+
+  gotoPrivateOutfits(BuildContext context){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => PrivateOutfits(uid: _auth.currentUser?.uid)));
+  }
+
+  gotoEditProfile(BuildContext context){
+     Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(uid: _auth.currentUser?.uid)));
+  }
+
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
@@ -115,11 +126,11 @@ class _UserPageState extends State<UserPage> {
                                 ),
                                 borderRadius: BorderRadius.circular(5)),
                             child: TextButton(
-                              onPressed: () => {},
+                              onPressed: () => gotoPrivateOutfits(context),
                               child: const Text(
-                                'Edit Profile',
+                                'Private Outfits',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
@@ -185,6 +196,7 @@ class _UserPageState extends State<UserPage> {
                             ),
                 ],
               ),
+              leading: null,
             ),
             body: ListView(
               children: [

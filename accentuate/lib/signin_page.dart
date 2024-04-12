@@ -50,7 +50,7 @@ class _SigninPageState extends State<SigninPage> {
       return null;
     }
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage( title: "")));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage( title: "")));
   }
 
   void goToForgotPassword(BuildContext context) {

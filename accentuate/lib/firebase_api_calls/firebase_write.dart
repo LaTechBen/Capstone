@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
@@ -142,8 +143,75 @@ class Write {
     return response;
   }
 
-  Future<String> uploadImages(List<File> images, bool isPost, String uid,
-      String username, String description) async {
+  Future<String> storeOutfit(File file, bool isPost) async {
+    Reference ref;
+    if(isPost){
+    ref = _storage.ref().child('posts').child(_auth.currentUser!.uid);
+    }
+    else{
+      ref = _storage.ref().child('outfits').child(_auth.currentUser!.uid);
+    }
+
+  String downloadUrl = "didnt save";
+    try{
+        String id = const Uuid().v1();
+        ref = ref.child(id);
+        final uploadTask = ref.putFile(file);
+        TaskSnapshot snapshot = await uploadTask;
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+        return downloadUrl;
+    }
+    catch (error){
+      throw Exception("There was a problem with storing the outfit.");
+    }
+  }
+
+  Future<String> uploadOutfit(File image, bool isPost, String uid, String username, String description) async {
+    String response = "Error occured";
+
+    try {
+      String photoUrl;
+
+        photoUrl = await storeOutfit(image, isPost);
+
+        String postID = const Uuid().v1();
+
+        Image img = Image(
+          datePublished: DateTime.now(),
+          description: description,
+          likes: [],
+          postID: postID,
+          postUrl: photoUrl,
+          uid: uid,
+          username: username,
+        );
+        if(isPost){
+          _firebase
+            .collection('users')
+            .doc(uid)
+            .collection("posts")
+            .doc(postID)
+            .set(img.toJson());
+        }
+        else{
+          _firebase
+            .collection('users')
+            .doc(uid)
+            .collection("outfits")
+            .doc(postID)
+            .set(img.toJson());
+        }
+      
+      response = "Success!";
+    } catch (error) {
+      response = error.toString();
+    }
+    log(response);
+    return response;
+  
+  }
+
+  Future<String> uploadImages(List<File> images, bool isPost, String uid, String username, String description) async {
     String response = "Error occured";
 
     try {
@@ -184,5 +252,41 @@ class Write {
       response = error.toString();
     }
     return response;
+  }
+
+  deletePost(String uid, DocumentSnapshot image, String location){
+    try {
+    _firebase.collection('users')
+    .doc(uid)
+    .collection(location)
+    .doc(image["postID"])
+    .delete();
+
+    } catch (error) {
+      log(error.toString());
+    }
+  }
+
+  moveOutfitToPublicOrPrivate(String uid, DocumentSnapshot image, String previousLocation, String newLocation){
+    Timestamp timestamp = image["datePublished"];
+    DateTime time = timestamp.toDate();
+    Image newImage = Image(datePublished: time, description: image["description"] , likes: image["likes"], postID: image["postID"], postUrl: image["postUrl"], uid: image["uid"], username: image["username"]);
+    try {
+    _firebase.collection('users')
+    .doc(uid)
+    .collection(previousLocation)
+    .doc(image["postID"])
+    .delete();
+
+    String postID = const Uuid().v1();
+    _firebase.collection('users')
+    .doc(uid)
+    .collection(newLocation)
+    .doc(postID)
+    .set(newImage.toJson());
+
+    } catch (error) {
+      log(error.toString());
+    }
   }
 }

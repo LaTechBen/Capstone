@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'home_page.dart';
 import 'firebase_api_calls/firebase_write.dart';
@@ -25,7 +26,9 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   var userdata = {};
   ImagePicker imagePicker = ImagePicker();
   List<XFile> imageFileList = [];
+  XFile? image;
   late HomePage _homePage;
+
 
   @override
   void initState() {
@@ -35,11 +38,16 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   }
 
   void selectedImages() async {
-    final List<XFile> selectedImages = await imagePicker.pickMultiImage();
-    if (selectedImages.isNotEmpty) {
-      imageFileList.addAll(selectedImages);
-    }
-    setState(() {});
+    // final List<XFile> selectedImages = await imagePicker.pickMultiImage();
+    XFile? tempimage = await imagePicker.pickImage(source: ImageSource.gallery);
+    image = tempimage!;
+    // if(selectedImages.isNotEmpty){
+    //   imageFileList.addAll(selectedImages);
+    // }
+    setState(() {
+      
+    });
+
   }
 
   getData() async {
@@ -68,13 +76,13 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
     }
   }
 
-  storeImage() async {
-    await _write.uploadImage(
-        '', selectedImage, _auth.currentUser!.uid, userdata['username'],
-        isProfile: false);
+  storeImage(bool isPublic) async {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Outfit saved.")));
+    await _write.uploadOutfit(convertXFiletoFile(image), isPublic, _auth.currentUser!.uid, userdata['username'], '');
   }
 
-  List<File> convertXFileToFile(List<XFile> files) {
+  List<File> convertXFilesToFiles(List<XFile> files) {
     List<File> output = [];
     for (XFile file in files) {
       output.add(File(file.path));
@@ -82,73 +90,57 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
     return output;
   }
 
+  File convertXFiletoFile(XFile? file){
+    return File(file!.path);
+  }
+
   storeImages(bool isPost) async {
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("Outfit saved.")));
-    await _write.uploadImages(convertXFileToFile(imageFileList), isPost,
-        _auth.currentUser!.uid, userdata['username'], 'Description');
+
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Outfit saved.")));
+    await _write.uploadImages(convertXFilesToFiles(imageFileList), isPost ,_auth.currentUser!.uid, userdata['username'], 'Description');
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(leading: null,),
       body: Center(
         child: Column(
           children: [
-            Expanded(
-                child: Padding(
+            Expanded(child: Padding(
+              // padding: const EdgeInsets.all(8.0),
+              // child: GridView.builder(
+              //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+              //   itemCount: imageFileList.length, 
+              //   itemBuilder: (BuildContext context, int index) { 
+              //     return Image.file(File(imageFileList[index].path), fit: BoxFit.cover,);
+              //     },
+              // ),
               padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3),
-                itemCount: imageFileList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Image.file(
-                    File(imageFileList[index].path),
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            )),
-            const SizedBox(
-              height: 10.0,
+              child:  image == null ? const SizedBox(height: 10.0) : Image.file(convertXFiletoFile(image)) 
+            )
             ),
-            (MyButton(
-                text: "Save Outfit",
-                onTap: () => {
-                      if (imageFileList.isEmpty)
-                        {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text("Please select pictures to save.")))
-                        }
-                      else
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () {
-                                          storeImages(false);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text("No")),
-                                    TextButton(
-                                        onPressed: () {
-                                          storeImages(true);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text("Yes"))
-                                  ],
-                                  title: const Text("Make Outfit Public?"),
-                                  contentPadding: const EdgeInsets.all(15.0),
-                                  content: const Text(
-                                      "Would you like to save your outfit as a post to be made public?"),
-                                ))
-                    })),
+            const SizedBox(height: 10.0,),
+            (
+            MyButton(text: "Save Outfit", onTap: () => {
+              if(image == null){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select pictures to save.")))
+              }
+              else
+              showDialog(context: context, builder: (context) => AlertDialog(
+                actions: [
+                  TextButton(onPressed: () {storeImage(false); Navigator.of(context).pop();}, 
+                    child: const Text("Private")), 
+                  TextButton(onPressed: () {storeImage(true); Navigator.of(context).pop();}, 
+                    child: const Text("Public"))
+                ],
+                title: const Text("Make Outfit Public?"),
+                contentPadding: const EdgeInsets.all(15.0),
+                content: const Text("Would you like to save your outfit to your private or public collection."),
+              ))
+            })
             const SizedBox(
               height: 10.0,
             ),
