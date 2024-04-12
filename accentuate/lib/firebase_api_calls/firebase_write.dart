@@ -227,4 +227,40 @@ class Write {
     }
     return response;
   }
+
+  deletePost(String uid, DocumentSnapshot image, String location){
+    try {
+    _firebase.collection('users')
+    .doc(uid)
+    .collection(location)
+    .doc(image["postID"])
+    .delete();
+
+    } catch (error) {
+      log(error.toString());
+    }
+  }
+
+  moveOutfitToPublicOrPrivate(String uid, DocumentSnapshot image, String previousLocation, String newLocation){
+    Timestamp timestamp = image["datePublished"];
+    DateTime time = timestamp.toDate();
+    Image newImage = Image(datePublished: time, description: image["description"] , likes: image["likes"], postID: image["postID"], postUrl: image["postUrl"], uid: image["uid"], username: image["username"]);
+    try {
+    _firebase.collection('users')
+    .doc(uid)
+    .collection(previousLocation)
+    .doc(image["postID"])
+    .delete();
+
+    String postID = const Uuid().v1();
+    _firebase.collection('users')
+    .doc(uid)
+    .collection(newLocation)
+    .doc(postID)
+    .set(newImage.toJson());
+
+    } catch (error) {
+      log(error.toString());
+    }
+  }
 }

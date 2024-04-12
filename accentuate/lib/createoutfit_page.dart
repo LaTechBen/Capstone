@@ -119,13 +119,13 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
               showDialog(context: context, builder: (context) => AlertDialog(
                 actions: [
                   TextButton(onPressed: () {storeImage(false); Navigator.of(context).pop();}, 
-                    child: const Text("No")), 
+                    child: const Text("Private")), 
                   TextButton(onPressed: () {storeImage(true); Navigator.of(context).pop();}, 
-                    child: const Text("Yes"))
+                    child: const Text("Public"))
                 ],
                 title: const Text("Make Outfit Public?"),
                 contentPadding: const EdgeInsets.all(15.0),
-                content: const Text("Would you like to save your outfit as a post to be made public?"),
+                content: const Text("Would you like to save your outfit to your private or public collection."),
               ))
             })
             ),

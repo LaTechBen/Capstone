@@ -83,7 +83,12 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
-  gotoEditProfile(){
+
+  gotoPrivateOutfits(BuildContext context){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => PrivateOutfits(uid: _auth.currentUser?.uid)));
+  }
+
+  gotoEditProfile(BuildContext context){
      Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(uid: _auth.currentUser?.uid)));
   }
 
@@ -121,11 +126,11 @@ class _UserPageState extends State<UserPage> {
                                 ),
                                 borderRadius: BorderRadius.circular(5)),
                             child: TextButton(
-                              onPressed: () => gotoEditProfile(),
+                              onPressed: () => gotoPrivateOutfits(context),
                               child: const Text(
-                                'Edit Profile',
+                                'Private Outfits',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
