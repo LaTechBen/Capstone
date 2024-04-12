@@ -12,11 +12,12 @@ import 'user_page.dart';
 import 'reverse_search_page.dart';
 import 'components/api_keys.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'reverse_search_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  Gemini.init(apiKey: gemini_api);
+  // Gemini.init(apiKey: gemini_api);
   runApp(const MyApp());
 }
 
