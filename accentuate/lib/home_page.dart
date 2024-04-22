@@ -894,34 +894,96 @@ class _HomePageState extends State<HomePage> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: (commentsMap[index] ?? [])
-                                      .map(
-                                        (comment) => Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 4),
-                                          child: RichText(
-                                            text: TextSpan(
-                                              style:
-                                                  DefaultTextStyle.of(context)
-                                                      .style,
+                                      .map((commentText) {
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 4),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                TextSpan(
-                                                  text: userData[
-                                                      'username'], // Assuming "Profile name" is the user name
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                RichText(
+                                                  text: TextSpan(
+                                                    style: DefaultTextStyle.of(
+                                                            context)
+                                                        .style,
+                                                    children: [
+                                                      TextSpan(
+                                                        text: userData[
+                                                            'username'], // Assuming "Profile name" is the user name
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      TextSpan(
+                                                          text:
+                                                              ' '), // Add space between user name and comment
+                                                      TextSpan(
+                                                          text: commentText),
+                                                    ],
+                                                  ),
                                                 ),
-                                                TextSpan(
-                                                    text:
-                                                        ' '), // Add space between user name and comment
-                                                TextSpan(text: comment),
                                               ],
                                             ),
                                           ),
-                                        ),
-                                      )
-                                      .toList(),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: TextButton(
+                                              onPressed: () {
+                                                // Call a function to delete the comment
+                                                deleteComment(
+                                                    index, commentText);
+                                              },
+                                              child: Text(
+                                                'Delete',
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
+
+                                // Column(
+                                //   crossAxisAlignment: CrossAxisAlignment.start,
+                                //   children: (commentsMap[index] ?? [])
+                                //       .map(
+                                //         (comment) => Padding(
+                                //           padding: EdgeInsets.symmetric(
+                                //               horizontal: 16, vertical: 4),
+                                //           child: RichText(
+                                //             text: TextSpan(
+                                //               style:
+                                //                   DefaultTextStyle.of(context)
+                                //                       .style,
+                                //               children: [
+                                //                 TextSpan(
+                                //                   text: userData[
+                                //                       'username'], // Assuming "Profile name" is the user name
+                                //                   style: TextStyle(
+                                //                       fontWeight:
+                                //                           FontWeight.bold),
+                                //                 ),
+                                //                 TextSpan(
+                                //                     text:
+                                //                         ' '), // Add space between user name and comment
+                                //                 TextSpan(text: comment),
+                                //               ],
+                                //             ),
+                                //           ),
+                                //         ),
+                                //       )
+                                //       .toList(),
+                                // ),
 
                                 // Text(
                                 //   "View all 12 comments",
