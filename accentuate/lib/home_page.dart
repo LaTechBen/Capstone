@@ -952,43 +952,6 @@ class _HomePageState extends State<HomePage> {
                                     );
                                   }).toList(),
                                 ),
-
-                                // Column(
-                                //   crossAxisAlignment: CrossAxisAlignment.start,
-                                //   children: (commentsMap[index] ?? [])
-                                //       .map(
-                                //         (comment) => Padding(
-                                //           padding: EdgeInsets.symmetric(
-                                //               horizontal: 16, vertical: 4),
-                                //           child: RichText(
-                                //             text: TextSpan(
-                                //               style:
-                                //                   DefaultTextStyle.of(context)
-                                //                       .style,
-                                //               children: [
-                                //                 TextSpan(
-                                //                   text: userData[
-                                //                       'username'], // Assuming "Profile name" is the user name
-                                //                   style: TextStyle(
-                                //                       fontWeight:
-                                //                           FontWeight.bold),
-                                //                 ),
-                                //                 TextSpan(
-                                //                     text:
-                                //                         ' '), // Add space between user name and comment
-                                //                 TextSpan(text: comment),
-                                //               ],
-                                //             ),
-                                //           ),
-                                //         ),
-                                //       )
-                                //       .toList(),
-                                // ),
-
-                                // Text(
-                                //   "View all 12 comments",
-                                //   style: TextStyle(color: Colors.black38),
-                                // )
                               ],
                             ),
                           ),
