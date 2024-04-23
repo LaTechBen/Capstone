@@ -73,6 +73,9 @@ Future<List<DocumentSnapshot>> getUsers(String query) async {
                 );
              });
          }
+         else if(snapshot.data['followers'].length == 0){
+          return const Text("There are no followers.");
+         }
        } return Center(child: CircularProgressIndicator(),);
      },
    ),

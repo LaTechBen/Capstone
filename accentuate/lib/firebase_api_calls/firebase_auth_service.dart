@@ -18,6 +18,7 @@ class FirebaseAuthService {
           "username": username,
           "following": [],
           "followers": [],
+          "profileImage": ""
        })
       });
       return credential.user;
