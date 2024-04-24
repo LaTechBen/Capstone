@@ -339,6 +339,48 @@ class _HomePageState extends State<HomePage> {
       print('Error adding comment: $e');
     }
   }
+
+  // delete post method
+  // Method to delete a post by index
+  void deletePost(int index) async {
+    // Get the reference to the post collection
+    CollectionReference postRef =
+        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
+
+    try {
+      // Query for documents and get their snapshots
+      QuerySnapshot querySnapshot = await postRef.get();
+
+      // Check if the index is within the bounds of retrieved documents
+      if (index >= 0 && index < querySnapshot.size) {
+        // Access the document snapshot at the specified index
+        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
+
+        // Ensure the document snapshot exists
+        if (docSnapshot.exists) {
+          // Delete the document from Firestore using its path
+          await FirebaseFirestore.instance
+              .doc(docSnapshot.reference.path)
+              .delete();
+
+          print('Post deleted successfully.');
+
+          // Fetch like counts and comments from Firestore
+          fetchLikeCountsAndComments();
+
+          // Close the dialog
+          Navigator.pop(context);
+        } else {
+          print('Document does not exist.');
+        }
+      } else {
+        print('Invalid index: $index');
+      }
+    } catch (e) {
+      print('Error deleting post: $e');
+    }
+  }
+
   /* ENDS HERE */
 
   Future<void> onRefresh() async {
@@ -534,6 +576,64 @@ class _HomePageState extends State<HomePage> {
   late String profileUrl = '';
   final storage = FirebaseStorage.instance;
 
+  void deleteComment(int postIndex, String commentText) async {
+    try {
+      // Get the reference to the post collection
+      CollectionReference postRef =
+          FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
+
+      // Query for documents and get their snapshots
+      QuerySnapshot querySnapshot = await postRef.get();
+
+      // Check if the postIndex is within the bounds of retrieved documents
+      if (postIndex >= 0 && postIndex < querySnapshot.size) {
+        // Access the document snapshot at the specified index
+        DocumentSnapshot docSnapshot = querySnapshot.docs[postIndex];
+
+        // Ensure the document snapshot exists
+        if (docSnapshot.exists) {
+          // Get the data of the document
+          Map<String, dynamic> data =
+              docSnapshot.data() as Map<String, dynamic>;
+
+          // Get the comments array
+          List<dynamic> comments = data['comments'];
+
+          // Find the index of the comment to be deleted
+          int commentIndex = comments
+              .indexWhere((comment) => comment['comment'] == commentText);
+
+          // Ensure the comment exists in the comments array
+          if (commentIndex != -1) {
+            // Get the UID of the comment author
+            String commentAuthorUid = comments[commentIndex]['uid'];
+
+            // Check if the comment belongs to the current user
+            if (commentAuthorUid == widget.uid) {
+              // Remove the comment from the comments array
+              comments.removeAt(commentIndex);
+
+              // Update the document in Firestore with the modified comments array
+              await docSnapshot.reference.update({'comments': comments});
+
+              print('Comment deleted successfully.');
+            } else {
+              print('You can only delete your own comments.');
+            }
+          } else {
+            print('Comment not found.');
+          }
+        } else {
+          print('Document does not exist.');
+        }
+      } else {
+        print('Invalid index: $postIndex');
+      }
+    } catch (e) {
+      print('Error deleting comment: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return isLoading
@@ -638,7 +738,30 @@ class _HomePageState extends State<HomePage> {
                               ),
                               Spacer(),
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  // Logic here
+                                  // Open a dialog to show options including delete
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Options'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () {
+                                                // Delete the post from Firebase
+                                                deletePost(index);
+                                              },
+                                              child: Text('Delete'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
                                 icon: Icon(Icons.more_vert),
                               )
                             ],
@@ -749,55 +872,86 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ]),
                                 ),
-                                RichText(
-                                  text: TextSpan(
-                                      style: TextStyle(color: Colors.black),
-                                      children: [
-                                        TextSpan(
-                                          text: " Profile Name",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                            text: " This is an amazing fit"),
-                                      ]),
-                                ),
+                                // RichText(
+                                //   text: TextSpan(
+                                //       style: TextStyle(color: Colors.black),
+                                //       children: [
+                                //         TextSpan(
+                                //           text: " Profile Name",
+                                //           style: TextStyle(
+                                //             fontWeight: FontWeight.bold,
+                                //           ),
+                                //         ),
+                                //         TextSpan(
+                                //             text: " This is an amazing fit"),
+                                //       ]),
+                                // ),
                                 // Display comments with user name in bold and comment in normal text
+
+                                /* Delete comment */
+
+                                /* ENDS HERE */
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: (commentsMap[index] ?? [])
-                                      .map((comment) => Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 4),
-                                            child: RichText(
-                                              text: TextSpan(
-                                                style:
-                                                    DefaultTextStyle.of(context)
+                                      .map((commentText) {
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 4),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                RichText(
+                                                  text: TextSpan(
+                                                    style: DefaultTextStyle.of(
+                                                            context)
                                                         .style,
-                                                children: [
-                                                  TextSpan(
-                                                    text: userData[
-                                                        'username'], // Assuming "Profile name" is the user name
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                    children: [
+                                                      TextSpan(
+                                                        text: userData[
+                                                            'username'], // Assuming "Profile name" is the user name
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      TextSpan(
+                                                          text:
+                                                              ' '), // Add space between user name and comment
+                                                      TextSpan(
+                                                          text: commentText),
+                                                    ],
                                                   ),
-                                                  TextSpan(
-                                                      text:
-                                                          ' '), // Add space between user name and comment
-                                                  TextSpan(text: comment),
-                                                ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: TextButton(
+                                              onPressed: () {
+                                                // Call a function to delete the comment
+                                                deleteComment(
+                                                    index, commentText);
+                                              },
+                                              child: Text(
+                                                'Delete',
+                                                style: TextStyle(
+                                                    color: Colors.red),
                                               ),
                                             ),
-                                          ))
-                                      .toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
-
-                                Text(
-                                  "View all 12 comments",
-                                  style: TextStyle(color: Colors.black38),
-                                )
                               ],
                             ),
                           ),

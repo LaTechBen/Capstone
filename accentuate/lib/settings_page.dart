@@ -1,3 +1,4 @@
+import 'package:accentuate/signin_page.dart';
 import 'package:flutter/material.dart';
 import 'personalinfo_page.dart';
 import 'accountinfo_page.dart';
@@ -61,6 +62,8 @@ class SettingsBody extends StatelessWidget {
           SettingsButton(icon: Icons.person, text: 'Account Information'),
           const SizedBox(height: 16),
           SettingsButton(icon: Icons.credit_card, text: 'Personal Information'),
+          const SizedBox(height: 16),
+          SettingsButton(icon: Icons.logout_rounded, text: 'Log out'),
         ],
       ),
     );
@@ -87,6 +90,11 @@ class SettingsButton extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const PersonalInfoPage()),
+          );
+        } else if (text == 'Log out') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SigninPage()),
           );
         }
       },
