@@ -8,12 +8,13 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_html/flutter_html.dart';
 // import 'package:html/dom.dart' as dom;
 // import 'package:http/http.dart' as http;
-import 'package:flutter_gemini/flutter_gemini.dart';
+// import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:google_gemini/google_gemini.dart';
 import 'package:flutter_gemini/src/models/candidates/candidates.dart';
 import 'home_page.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'components/api_keys.dart';
+// import 'package:flutter_gemini/src/models/content/content.dart';
 
 class ReverseSearch extends StatefulWidget {
   // final Widget child;
@@ -60,15 +61,16 @@ class _ReverseSearchState extends State<ReverseSearch> {
 
 class GeminiResponse extends StatefulWidget {
   final File image;
-  GeminiResponse({super.key, required this.image});
-  List response = [];
+  const GeminiResponse({super.key, required this.image});
 
   @override
   State<GeminiResponse> createState() => _GeminiResponseState();
 }
 
 class _GeminiResponseState extends State<GeminiResponse> {
-  final gemini = GoogleGemini(apiKey: gemini_api);
+  // final gemini = GoogleGemini(apiKey: gemini_api);
+  bool loading = false;
+  String response = '';
 
   @override
   void initState() {
@@ -78,23 +80,40 @@ class _GeminiResponseState extends State<GeminiResponse> {
   }
 
   void GeminiResult({required File image}) async {
-    await gemini
-        .generateFromTextAndImages(
-          query:
-              "Find similar products and give me an image of the product with a description.",
+    final model =
+        GenerativeModel(model: "gemini-pro-vision", apiKey: gemini_api);
+    // setState(() async {
+    loading = true;
+    final gemini_response = await model.generateContent([
+      Content.text(
+          "Find similar products and give me an image of the product with a description."),
+      Content.data("images/p1.jpg", image.readAsBytes() as Uint8List),
+    ]);
+    // });
 
-          /// text
-          image: image,
-        )
-        .then((value) => {
-              setState(
-                (
-                  (_) {
-                    widget.response.add({'text': value.text});
-                  },
-                ) as VoidCallback,
-              )
-            });
+    setState(() {
+      response = gemini_response.text!;
+      loading = false;
+    });
+
+    // await gemini
+    //     .generateFromTextAndImages(
+    //       query:
+    //           "Find similar products and give me an image of the product with a description.",
+
+    //       /// text
+    //       image: image,
+    //     )
+    //     .then((value) => {
+    //           setState(
+    //             (
+    //               (_) {
+    //                 loading = false;
+    //                 widget.response.add({'text': value.text});
+    //               },
+    //             ) as VoidCallback,
+    //           )
+    //         });
   }
 
   Widget makeDismissible(
@@ -124,16 +143,18 @@ class _GeminiResponseState extends State<GeminiResponse> {
             ),
           ),
           padding: const EdgeInsets.all(16),
-          child: ListView.builder(
-            itemCount: widget.response.length,
-            padding: const EdgeInsets.only(bottom: 20),
-            itemBuilder: (context, index) {
-              return ListTile(
-                isThreeLine: true,
-                subtitle: Text(widget.response[index]['text']),
-              );
-            },
-          ),
+          child: loading
+              ? const CircularProgressIndicator()
+              : ListView.builder(
+                  itemCount: 1,
+                  padding: const EdgeInsets.only(bottom: 20),
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      isThreeLine: true,
+                      subtitle: Text(response),
+                    );
+                  },
+                ),
         ),
       ),
     );
