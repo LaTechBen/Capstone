@@ -113,6 +113,7 @@ class _UserPageState extends State<UserPage> {
     print("UNFOLLOW " + followers.toString());
     _firestore.collection("users").doc(_auth.currentUser?.uid).update({"following" : following});
     _firestore.collection("users").doc(uid).update({"followers" : followers});
+      getData();
         } catch (error){
       print(error.toString());
     }
@@ -130,6 +131,7 @@ class _UserPageState extends State<UserPage> {
     print("FOLLOW: " + followers.toString());
     _firestore.collection("users").doc(_auth.currentUser?.uid).update({"following" : following});
     _firestore.collection("users").doc(uid).update({"followers" : followers});
+      getData();
     } catch (error){
       print(error.toString());
     }
@@ -264,7 +266,7 @@ class _UserPageState extends State<UserPage> {
                                 backgroundImage:
                                     NetworkImage(userData['profileImage']),
                                 radius: 38,
-                                child: userData['profileImage'] == Null
+                                child: userData['profileImage'] == ""
                                     ? Text(
                                         userData['username']
                                             .substring(0, 2)
