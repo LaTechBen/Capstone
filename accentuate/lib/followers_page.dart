@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:accentuate/user_page.dart';
@@ -42,6 +43,30 @@ Future<List<DocumentSnapshot>> getUsers(String query) async {
     return text.similarityTo(query);
   }
 
+Future<List<String>> getUsernameFromUid(List<dynamic> uids) async {
+  List<String> usernames = [];
+
+  try {
+    for (String uid in uids) {
+      var docSnapshot = await _firebase.collection('users').doc(uid).get();
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        // Explicitly cast the username to a String and handle possible nulls
+        var username = docSnapshot.data()!['username'] as String?;
+        usernames.add(username ?? 'Unknown'); // Provide a default value for null or missing usernames
+      } else {
+        usernames.add('Unknown'); // Handle cases where the document doesn't exist
+      }
+      
+    }
+  } catch (e) {
+    // Log the error or handle it as needed
+    print('Error fetching usernames: $e');
+    throw Exception('Failed to fetch usernames');
+  }
+
+  return usernames;
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,34 +76,44 @@ Future<List<DocumentSnapshot>> getUsers(String query) async {
     centerTitle: true,
     backgroundColor: Colors.pink[100],),
 
-   body:  StreamBuilder(
-     stream: _firebase.collection('users').doc(widget.uid).snapshots(),
-     builder: (context,AsyncSnapshot snapshot) {
-       if(snapshot.hasData) {
-        print(snapshot.data['followers'].toString());
-         if(snapshot.data['followers'].length > 0) {
-           var snap = snapshot.data;
-           return ListView.builder(
-             itemCount: snap['followers'].length,
-             itemBuilder: (context,index) {
-               var snaps = snapshot.data['followers'];
-                return ListTile(
-                  leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(150),
-                      child: Text(
-                        snaps[index]
-                      ),
-                    ),
-
+body: StreamBuilder(
+      stream: _firebase.collection('users').doc(widget.uid).snapshots(),
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data['followers'].length > 0) {
+            var snap = snapshot.data;
+            return ListView.builder(
+              itemCount: snap['followers'].length,
+              itemBuilder: (context, index) {
+                return FutureBuilder(
+                  future: getUsernameFromUid(snap['followers']),
+                  builder: (context, AsyncSnapshot<List<String>> usernamesSnapshot) {
+                    if (usernamesSnapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (usernamesSnapshot.hasData) {
+                      print(usernamesSnapshot.data);
+                      return ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(150),
+                          child: Text(
+                            usernamesSnapshot.data![index], style: TextStyle(fontSize: 24.0)// Access the specific username
+                          )
+                        ),
+                      );
+                    } else {
+                      return Text("Error retrieving username", style: TextStyle(fontSize: 24.0));
+                    }
+                  },
                 );
-             });
-         }
-         else if(snapshot.data['followers'].length == 0){
-          return const Text("There are no followers.");
-         }
-       } return Center(child: CircularProgressIndicator(),);
-     },
-   ),
+              }
+            );
+          } else if (snapshot.data['followers'].length == 0) {
+            return const Text("There are no followers.", style: TextStyle(fontSize: 24.0));
+          }
+        }
+        return const Center(child: CircularProgressIndicator());
+      },
+    ),
     );
   }
 }
