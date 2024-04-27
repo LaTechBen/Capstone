@@ -84,7 +84,7 @@ class _GeminiResponseState extends State<GeminiResponse> {
         GenerativeModel(model: "gemini-pro-vision", apiKey: gemini_api);
     // setState(() async {
     loading = true;
-    final gemini_response = await model.generateContent([
+    final geminiResponse = await model.generateContent([
       Content.text(
           "Find similar products and give me an image of the product with a description."),
       Content.data("images/p1.jpg", image.readAsBytes() as Uint8List),
@@ -92,7 +92,7 @@ class _GeminiResponseState extends State<GeminiResponse> {
     // });
 
     setState(() {
-      response = gemini_response.text!;
+      response = geminiResponse.text!;
       loading = false;
     });
 
@@ -136,26 +136,57 @@ class _GeminiResponseState extends State<GeminiResponse> {
         minChildSize: 0.5,
         maxChildSize: 0.9,
         builder: (_, controller) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(22),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(22),
+              ),
             ),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: loading
-              ? const CircularProgressIndicator()
-              : ListView.builder(
-                  itemCount: 1,
-                  padding: const EdgeInsets.only(bottom: 20),
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      isThreeLine: true,
-                      subtitle: Text(response),
-                    );
-                  },
-                ),
-        ),
+            padding: const EdgeInsets.all(16),
+            child: loading
+                ? const CircularProgressIndicator()
+                // ? ListView.builder(
+                //     itemCount: 5,
+                //     padding: const EdgeInsets.only(bottom: 20),
+                //     itemBuilder: (context, index) {
+                //       return Card(
+                //         child: Row(
+                //           children: [
+                //             SizedBox(
+                //               width: 130,
+                //               child: Image.asset('images/p1.jpg',
+                //                   fit: BoxFit.fill),
+                //             ),
+                //             const SizedBox(
+                //               width: 20,
+                //             ),
+                //             const Text("Lorum ipsum"),
+                //           ],
+                //         ),
+                //       );
+                //     },
+                //   )
+                : ListView.builder(
+                    itemCount: 1,
+                    padding: const EdgeInsets.only(bottom: 20),
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 130,
+                              child: Image.asset('images/logo.png',
+                                  fit: BoxFit.fill),
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(response),
+                          ],
+                        ),
+                      );
+                    },
+                  )),
       ),
     );
   }
