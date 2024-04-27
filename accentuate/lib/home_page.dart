@@ -534,43 +534,57 @@ class _HomePageState extends State<HomePage> {
   late List<String> postUrls;
 
   Future<void> getImageUrl() async {
-    setState(() {
-      isLoading = true;
-    });
+  setState(() {
+    isLoading = true;
+  });
 
-    try {
-      // Get reference to the Firestore collection
-      CollectionReference postsCollection = FirebaseFirestore.instance.collection(
-          'users/${widget.uid}/posts'); // Adjust path to your 'posts' subcollection
+  try {
+    // Get the current user's document reference
+    DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(widget.uid);
+    
+    // Get the current user's document
+    DocumentSnapshot userDoc = await userDocRef.get();
 
-      // Get all documents from the 'posts' subcollection
+    // Get the list of users that the current user is following
+    List<String> followingUsers = List<String>.from(userDoc.get('following'));
+
+    //print("Following Users: $followingUsers");
+
+    // List to store post URLs
+    List<String> urls = [];
+
+    // Iterate through each user that the current user is following
+    for (String userId in followingUsers) {
+      // Get reference to the Firestore collection of posts of the following user
+      CollectionReference postsCollection = FirebaseFirestore.instance.collection('users/$userId/posts');
+
+      //print("postsCollection: $postsCollection");
+
+      // Get documents from the posts collection
       QuerySnapshot postsSnapshot = await postsCollection.get();
 
-      if (postsSnapshot.docs.isNotEmpty) {
-        // Extract image URLs from the documents
-        List<String> urls = postsSnapshot.docs.map((doc) {
-          // Assuming each document has a field named 'imageUrl' containing the image URL
-          return doc['postUrl'] as String; // Adjust field name if necessary
-        }).toList();
+      // Extract post URLs from the documents of the following user
+      List<String> userUrls = postsSnapshot.docs.map((doc) {    
+        return doc['postUrl'] as String; 
+      }).toList();
 
-        setState(() {
-          postUrls = urls;
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          // No documents found, set postUrls to an empty list
-          postUrls = [];
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error getting image URLs: $e');
-      setState(() {
-        isLoading = false;
-      });
+      urls.addAll(userUrls);
     }
+
+    setState(() {
+      postUrls = urls;
+      isLoading = false;
+      //print("Post Urls: $postUrls");
+    });
+  } catch (e) {
+    print('Error getting image URLs: $e');
+    setState(() {
+      isLoading = false;
+    });
   }
+}
+
+
 
   late String imageUrl = '';
   late String profileUrl = '';
