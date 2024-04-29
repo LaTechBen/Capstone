@@ -673,37 +673,37 @@ class _HomePageState extends State<HomePage> {
               child: SingleChildScrollView(
                 child: Column(children: [
                   //Story
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: List.generate(
-                        8,
-                        (index) => Container(
-                            padding: EdgeInsets.all(10),
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                  radius: 35,
-                                  backgroundImage: AssetImage(
-                                    "images/story.png",
-                                  ),
-                                  child: CircleAvatar(
-                                      radius: 32,
-                                      backgroundImage: AssetImage(
-                                        profileImages[index],
-                                      )),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  "Profile Name",
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.black87),
-                                )
-                              ],
-                            )),
-                      ),
-                    ),
-                  ),
+                  // SingleChildScrollView(
+                  //   scrollDirection: Axis.horizontal,
+                  //   child: Row(
+                  //     children: List.generate(
+                  //       8,
+                  //       (index) => Container(
+                  //           padding: EdgeInsets.all(10),
+                  //           child: Column(
+                  //             children: [
+                  //               CircleAvatar(
+                  //                 radius: 35,
+                  //                 backgroundImage: AssetImage(
+                  //                   "images/story.png",
+                  //                 ),
+                  //                 child: CircleAvatar(
+                  //                     radius: 32,
+                  //                     backgroundImage: AssetImage(
+                  //                       profileImages[index],
+                  //                     )),
+                  //               ),
+                  //               SizedBox(height: 10),
+                  //               Text(
+                  //                 "Profile Name",
+                  //                 style: TextStyle(
+                  //                     fontSize: 12, color: Colors.black87),
+                  //               )
+                  //             ],
+                  //           )),
+                  //     ),
+                  //   ),
+                  //  ),
 
                   /* IMAGES FROM FIREBASE */
 
