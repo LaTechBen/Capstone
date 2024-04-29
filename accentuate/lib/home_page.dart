@@ -467,6 +467,13 @@ class _HomePageState extends State<HomePage> {
       CollectionReference postRef =
           FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
 
+      // Get the reference to the users collection
+      CollectionReference userRef =
+          FirebaseFirestore.instance.collection('users');
+
+      // Retrieve all the documents within the collection
+      QuerySnapshot userSnapshot = await userRef.get();
+
       // Retrieve all documents within the collection
       QuerySnapshot querySnapshot = await postRef.get();
 
@@ -524,6 +531,33 @@ class _HomePageState extends State<HomePage> {
         //commentsMap[index] = comments.map((comment) => comment['comment']).toList();
       }
 
+      //
+      for (int index = 0; index < userSnapshot.docs.length; index++) {
+        // Access the document snapshot at the current index
+        DocumentSnapshot userdoc = userSnapshot.docs[index];
+
+        // Access the data of each document
+        Map<String, dynamic> userdata = userdoc.data() as Map<String, dynamic>;
+
+        // Ensure the document contains the "following" field and it's an array
+        if (!userdata.containsKey('following') ||
+            !(userdata['following'] is List)) {
+          // Add a new empty "following" array to the document
+          await userdoc.reference.update({'following': []});
+          // Update the data variable to include the empty "comments" array
+          userdata['following'] = [];
+        }
+
+        // Ensure the document contains the "followers" field and it's an array
+        if (!userdata.containsKey('followers') ||
+            !(userdata['followers'] is List)) {
+          // Add a new empty "followers" array to the document
+          await userdoc.reference.update({'followers': []});
+          // Update the data variable to include the empty "comments" array
+          userdata['followers'] = [];
+        }
+      }
+
       // Update the UI to reflect the changes
       setState(() {});
     } catch (e) {
@@ -534,57 +568,57 @@ class _HomePageState extends State<HomePage> {
   late List<String> postUrls;
 
   Future<void> getImageUrl() async {
-  setState(() {
-    isLoading = true;
-  });
+    setState(() {
+      isLoading = true;
+    });
 
-  try {
-    // Get the current user's document reference
-    DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(widget.uid);
-    
-    // Get the current user's document
-    DocumentSnapshot userDoc = await userDocRef.get();
+    try {
+      // Get the current user's document reference
+      DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(widget.uid);
 
-    // Get the list of users that the current user is following
-    List<String> followingUsers = List<String>.from(userDoc.get('following'));
+      // Get the current user's document
+      DocumentSnapshot userDoc = await userDocRef.get();
 
-    //print("Following Users: $followingUsers");
+      // Get the list of users that the current user is following
+      List<String> followingUsers = List<String>.from(userDoc.get('following'));
 
-    // List to store post URLs
-    List<String> urls = [];
+      //print("Following Users: $followingUsers");
 
-    // Iterate through each user that the current user is following
-    for (String userId in followingUsers) {
-      // Get reference to the Firestore collection of posts of the following user
-      CollectionReference postsCollection = FirebaseFirestore.instance.collection('users/$userId/posts');
+      // List to store post URLs
+      List<String> urls = [];
 
-      //print("postsCollection: $postsCollection");
+      // Iterate through each user that the current user is following
+      for (String userId in followingUsers) {
+        // Get reference to the Firestore collection of posts of the following user
+        CollectionReference postsCollection =
+            FirebaseFirestore.instance.collection('users/$userId/posts');
 
-      // Get documents from the posts collection
-      QuerySnapshot postsSnapshot = await postsCollection.get();
+        //print("postsCollection: $postsCollection");
 
-      // Extract post URLs from the documents of the following user
-      List<String> userUrls = postsSnapshot.docs.map((doc) {    
-        return doc['postUrl'] as String; 
-      }).toList();
+        // Get documents from the posts collection
+        QuerySnapshot postsSnapshot = await postsCollection.get();
 
-      urls.addAll(userUrls);
+        // Extract post URLs from the documents of the following user
+        List<String> userUrls = postsSnapshot.docs.map((doc) {
+          return doc['postUrl'] as String;
+        }).toList();
+
+        urls.addAll(userUrls);
+      }
+
+      setState(() {
+        postUrls = urls;
+        isLoading = false;
+        //print("Post Urls: $postUrls");
+      });
+    } catch (e) {
+      print('Error getting image URLs: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    setState(() {
-      postUrls = urls;
-      isLoading = false;
-      //print("Post Urls: $postUrls");
-    });
-  } catch (e) {
-    print('Error getting image URLs: $e');
-    setState(() {
-      isLoading = false;
-    });
   }
-}
-
-
 
   late String imageUrl = '';
   late String profileUrl = '';
