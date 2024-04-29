@@ -852,7 +852,9 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         TextSpan(text: "Liked by"),
                                         TextSpan(
-                                          text: " Profile Name",
+                                          text: likeCounts[index] == 0
+                                              ? " "
+                                              : " ${userData['username']}",
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                           ),
