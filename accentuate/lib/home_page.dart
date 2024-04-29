@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:accentuate/components/my_image_grid.dart';
 import 'package:accentuate/createoutfit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -768,6 +769,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           // Image Post
                           Image.network(postUrls[index]),
+                          // ImageGrid(imageUrls: postUrls, onImageClicked: (int i) => {}, onExpandClicked: () => {}),
                           // Footer Post
                           Row(
                             children: [
