@@ -414,6 +414,8 @@ class _HomePageState extends State<HomePage> {
     // Set the initial value of imageUrl to an empty string
     imageUrl = '';
     postUrls = [];
+    userUrls = [];
+    imgUrls = [];
     // Retrieve the image from Firebase Storage
     getImageUrl();
     // Fetch like counts and comments from Firestore
@@ -518,17 +520,6 @@ class _HomePageState extends State<HomePage> {
 
 // Store comments for the current post in the commentsMap with the index as the key
         commentsMap[index] = commentTexts;
-
-        // Retrieve comments for the current post
-        // List<Map<String, dynamic>> comments = data.containsKey('comments')
-        //     ? (data['comments'] as List<dynamic>).cast<Map<String, dynamic>>()
-        //     : [];
-
-        // Extract just the 'comment' field from each map
-        //List<String> commentTexts = comments.map((comment) => comment['comment']).toList();
-
-        // Store comments for the current post in the commentsMap with the index as the key
-        //commentsMap[index] = comments.map((comment) => comment['comment']).toList();
       }
 
       //
@@ -567,6 +558,10 @@ class _HomePageState extends State<HomePage> {
 
   late List<String> postUrls;
 
+  late List<String> userUrls;
+
+  late List<String> imgUrls;
+
   Future<void> getImageUrl() async {
     setState(() {
       isLoading = true;
@@ -576,6 +571,13 @@ class _HomePageState extends State<HomePage> {
       // Get the current user's document reference
       DocumentReference userDocRef =
           FirebaseFirestore.instance.collection('users').doc(widget.uid);
+
+      // Get the reference to the users collection
+      CollectionReference userRef =
+          FirebaseFirestore.instance.collection('users');
+
+      // Retrieve all the documents within the collection
+      QuerySnapshot userSnapshot = await userRef.get();
 
       // Get the current user's document
       DocumentSnapshot userDoc = await userDocRef.get();
@@ -587,6 +589,11 @@ class _HomePageState extends State<HomePage> {
 
       // List to store post URLs
       List<String> urls = [];
+
+      // List to store the user's profile image and user names
+      List<String> profileImgs = [];
+
+      List<String> userNames = [];
 
       // Iterate through each user that the current user is following
       for (String userId in followingUsers) {
@@ -604,11 +611,21 @@ class _HomePageState extends State<HomePage> {
           return doc['postUrl'] as String;
         }).toList();
 
+        // Extract username URLs from the documents of the following user
+        List<String> usernameUrls = postsSnapshot.docs.map((doc) {
+          return doc['username'] as String;
+        }).toList();
+
         urls.addAll(userUrls);
+
+        userNames.addAll(usernameUrls);
+
+        //List<String> profileImgUrls = postsSnapshot.docs.map().toList();
       }
 
       setState(() {
         postUrls = urls;
+        userUrls = userNames;
         isLoading = false;
         //print("Post Urls: $postUrls");
       });
@@ -720,39 +737,6 @@ class _HomePageState extends State<HomePage> {
               onRefresh: onRefresh,
               child: SingleChildScrollView(
                 child: Column(children: [
-                  //Story
-                  // SingleChildScrollView(
-                  //   scrollDirection: Axis.horizontal,
-                  //   child: Row(
-                  //     children: List.generate(
-                  //       8,
-                  //       (index) => Container(
-                  //           padding: EdgeInsets.all(10),
-                  //           child: Column(
-                  //             children: [
-                  //               CircleAvatar(
-                  //                 radius: 35,
-                  //                 backgroundImage: AssetImage(
-                  //                   "images/story.png",
-                  //                 ),
-                  //                 child: CircleAvatar(
-                  //                     radius: 32,
-                  //                     backgroundImage: AssetImage(
-                  //                       profileImages[index],
-                  //                     )),
-                  //               ),
-                  //               SizedBox(height: 10),
-                  //               Text(
-                  //                 "Profile Name",
-                  //                 style: TextStyle(
-                  //                     fontSize: 12, color: Colors.black87),
-                  //               )
-                  //             ],
-                  //           )),
-                  //     ),
-                  //   ),
-                  //  ),
-
                   /* IMAGES FROM FIREBASE */
 
                   Divider(),
@@ -782,7 +766,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Text(
-                                userData['username'],
+                                userUrls[index],
+                                //userData['username'],
                               ),
                               Spacer(),
                               IconButton(
