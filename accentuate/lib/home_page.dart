@@ -723,14 +723,14 @@ class _HomePageState extends State<HomePage> {
                   },
                   icon: const Icon(Icons.add_circle_outline),
                 ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.favorite_border),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.chat_bubble_outline),
-                )
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.favorite_border),
+                // ),
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.chat_bubble_outline),
+                // )
               ],
             ),
             body: RefreshIndicator(
