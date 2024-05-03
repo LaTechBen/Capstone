@@ -153,7 +153,7 @@ class _UserPageState extends State<UserPage> {
           )
         : Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color.fromARGB(255, 233, 30, 99),
+              backgroundColor: const Color.fromARGB(255, 248, 201, 205),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

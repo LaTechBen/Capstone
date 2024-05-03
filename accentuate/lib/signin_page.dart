@@ -76,19 +76,17 @@ class _SigninPageState extends State<SigninPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.pink[100],
+        backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: SafeArea(
               child: Center(
                   child: Column(
             children: [
-              const SizedBox(height: 10),
           
               // Logo
-              Image.asset('images/newLogo.png'),
+              Image.asset('images/signinlogo.png'),
           
               // padding
-              const SizedBox(height: 10),
           
               // email input
               MyTextField(

@@ -644,8 +644,8 @@ class _HomePageState extends State<HomePage> {
         : Scaffold(
             appBar: AppBar(
               title: Image.asset(
-                "images/logo.png",
-                height: 50,
+                "images/smallapplogo.png",
+                height: 70,
               ),
               leading: null,
               actions: [

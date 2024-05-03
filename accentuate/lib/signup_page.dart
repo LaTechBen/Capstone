@@ -124,7 +124,7 @@ bool isUsernameCompliant(String username){
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.pink[100],
+        backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: SafeArea(
               child: Center(

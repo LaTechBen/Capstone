@@ -40,7 +40,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.pink[100],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: Column(

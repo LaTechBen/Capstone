@@ -59,7 +59,7 @@ class _ImageGridState extends State<ImageGrid> {
                 Positioned.fill(
                   child: Container(
                     alignment: Alignment.center,
-                    color: Colors.black54,
+                    color: Colors.black12,
                     child: Text(
                       '+' + remaining.toString(),
                       style: TextStyle(fontSize: 32),
