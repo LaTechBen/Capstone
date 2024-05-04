@@ -1,4 +1,5 @@
 import 'package:accentuate/components/my_button.dart';
+import 'package:accentuate/components/my_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,6 +29,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   List<XFile> imageFileList = [];
   XFile? image;
   late HomePage _homePage;
+  final TextEditingController _descriptionController = TextEditingController();
 
 
   @override
@@ -95,10 +97,11 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   }
 
   storeImages(bool isPost) async {
+    String desc = _descriptionController.text;
     Navigator.of(context).pop();
 
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Outfit saved.")));
-    await _write.uploadImages(convertXFilesToFiles(imageFileList), isPost ,_auth.currentUser!.uid, userdata['username'], 'Description');
+    await _write.uploadImages(convertXFilesToFiles(imageFileList), isPost ,_auth.currentUser!.uid, userdata['username'], desc);
 
   }
 
@@ -123,10 +126,20 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
             )
             ),
             const SizedBox(height: 10.0,),
-            
+
+
+            MyTextField(controller: _descriptionController, hintText: "Description", obscureText: false),
+
+            const SizedBox(
+              height: 10.0,
+            ),
+
             MyButton(text: "Save Outfit", onTap: () => {
               if(imageFileList.isEmpty){
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select pictures to save.")))
+              }
+              else if (_descriptionController.text.isEmpty){
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please give the outfit a description.")))
               }
               else
               showDialog(context: context, builder: (context) => AlertDialog(

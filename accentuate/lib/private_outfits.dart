@@ -1,3 +1,5 @@
+import 'package:accentuate/components/my_image_grid.dart';
+import 'package:accentuate/components/my_image_list_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -66,14 +68,28 @@ class _PrivateOutfitsState extends State<PrivateOutfits> {
 
                           return GestureDetector(
                             child: SizedBox(
-                              child: Image(
-                                image: NetworkImage(
-                                  snap['postUrl'],
+                              child: ImageGrid(
+                                imageUrls: snap['postUrl'],
+                                onExpandClicked: () {Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageListPage(
+                                      imageUrls: snap['postUrl'],
+                                      description: snap['description'],),
                                 ),
-                                fit: BoxFit.cover,
+                              );},
+                                onImageClicked: (int i) {Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageListPage(
+                                      imageUrls: snap['postUrl'],
+                                      description: snap['description'],),
+                                ),
+                              );},
+                                maxImages: 1,
                               ),
                             ),
-                            onTap: () => {
+                            onLongPress: () => {
                               // Navigator.push(
                               //   context,
                               //   MaterialPageRoute(

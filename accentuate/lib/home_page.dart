@@ -419,6 +419,7 @@ class _HomePageState extends State<HomePage> {
     postUrls = [];
     userUrls = [];
     imgUrls = [];
+    descriptions = [];
     // Retrieve the image from Firebase Storage
     getImageUrl();
     // Fetch like counts and comments from Firestore
@@ -565,6 +566,8 @@ class _HomePageState extends State<HomePage> {
 
   late List<String> imgUrls;
 
+  late List<String> descriptions;
+
   Future<void> getImageUrl() async {
     setState(() {
       isLoading = true;
@@ -598,6 +601,8 @@ class _HomePageState extends State<HomePage> {
 
       List<String> userNames = [];
 
+      List<String> postDescs = [];
+
       // Iterate through each user that the current user is following
       for (String userId in followingUsers) {
         // Get reference to the Firestore collection of posts of the following user
@@ -612,24 +617,30 @@ class _HomePageState extends State<HomePage> {
         List<List<dynamic>> userUrls = postsSnapshot.docs.map((doc) {
           return doc['postUrl'] as List<dynamic>;
         }).toList();
-        print("Hi");
-        print(userUrls);
         // Extract username URLs from the documents of the following user
         List<String> usernameUrls = postsSnapshot.docs.map((doc) {
           return doc['username'] as String;
         }).toList();
 
+        List<String> descs = postsSnapshot.docs.map((doc) {
+          return doc['description'] as String;
+        }).toList();
+
+        print(descs);
+
         urls.addAll(userUrls);
 
         userNames.addAll(usernameUrls);
+
+        postDescs.addAll(descs);
 
         //List<String> profileImgUrls = postsSnapshot.docs.map().toList();
       }
 
       setState(() {
         postUrls = urls;
-        print(postUrls);
         userUrls = userNames;
+        descriptions = postDescs;
         isLoading = false;
         //print("Post Urls: $postUrls");
       });
@@ -809,13 +820,15 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ImageListPage(
-                                      imageUrls: postUrls[index]),
+                                      imageUrls: postUrls[index],
+                                      description: descriptions[index],),
                                 ),
                               ),}, onExpandClicked: () => {Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ImageListPage(
-                                      imageUrls: postUrls[index]),
+                                      imageUrls: postUrls[index],
+                                      description: descriptions[index],),
                                 ),
                               ),}, maxImages: 1),
                           // Footer Post

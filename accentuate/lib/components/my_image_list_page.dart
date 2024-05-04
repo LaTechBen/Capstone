@@ -5,21 +5,27 @@ import 'package:flutter/material.dart';
 
 class ImageListPage extends StatefulWidget {
     final List<dynamic> imageUrls;
-  const ImageListPage({super.key, required this.imageUrls});
+    final String description;
+  const ImageListPage({super.key, required this.imageUrls, required this.description});
 
   @override
   State<ImageListPage> createState() => _ImageListPageState();
 }
 
 class _ImageListPageState extends State<ImageListPage> {
+  
   @override
   Widget build(BuildContext context) {
+    String desc = widget.description;
     List<dynamic> images = widget.imageUrls;
     return Scaffold(
       appBar: AppBar(leading: null,),
       body: Center(
         child: Column(
           children: [
+            Text(desc, style: TextStyle(
+              fontSize: 20.0
+            ),),
             Expanded(child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
