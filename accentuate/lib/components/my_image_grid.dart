@@ -24,8 +24,10 @@ class _ImageGridState extends State<ImageGrid> {
         maxCrossAxisExtent: 200,
         crossAxisSpacing: 2,
         mainAxisSpacing: 2,
+
       ),
       children: images,
+      
     );
   }
 
