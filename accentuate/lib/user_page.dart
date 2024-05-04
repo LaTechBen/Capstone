@@ -320,14 +320,16 @@ class _UserPageState extends State<UserPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ImageListPage(
-                                      imageUrls: snap['postUrl']),
+                                      imageUrls: snap['postUrl'],
+                                      description: snap['description'],),
                                 ),
                               ),}, 
                             onExpandClicked: () => {Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ImageListPage(
-                                      imageUrls: snap['postUrl']),
+                                      imageUrls: snap['postUrl'],
+                                      description: snap['description'],),
                                 ),
                               ),},
                             maxImages: 1,
