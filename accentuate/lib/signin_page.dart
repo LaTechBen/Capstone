@@ -86,8 +86,6 @@ class _SigninPageState extends State<SigninPage> {
               // Logo
               Image.asset('images/signinlogo.png'),
           
-              // padding
-          
               // email input
               MyTextField(
                 controller: _emailController,

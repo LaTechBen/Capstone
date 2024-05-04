@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:accentuate/components/my_image_grid.dart';
+import 'package:accentuate/components/my_image_grid_page.dart';
 import 'package:accentuate/createoutfit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -557,7 +558,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  late List<String> postUrls;
+  late List<dynamic> postUrls;
 
   late List<String> userUrls;
 
@@ -589,7 +590,7 @@ class _HomePageState extends State<HomePage> {
       //print("Following Users: $followingUsers");
 
       // List to store post URLs
-      List<String> urls = [];
+      List<dynamic> urls = [];
 
       // List to store the user's profile image and user names
       List<String> profileImgs = [];
@@ -606,12 +607,12 @@ class _HomePageState extends State<HomePage> {
 
         // Get documents from the posts collection
         QuerySnapshot postsSnapshot = await postsCollection.get();
-
         // Extract post URLs from the documents of the following user
-        List<String> userUrls = postsSnapshot.docs.map((doc) {
-          return doc['postUrl'] as String;
+        List<List<dynamic>> userUrls = postsSnapshot.docs.map((doc) {
+          return doc['postUrl'] as List<dynamic>;
         }).toList();
-
+        print("Hi");
+        print(userUrls);
         // Extract username URLs from the documents of the following user
         List<String> usernameUrls = postsSnapshot.docs.map((doc) {
           return doc['username'] as String;
@@ -626,6 +627,7 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         postUrls = urls;
+        print(postUrls);
         userUrls = userNames;
         isLoading = false;
         //print("Post Urls: $postUrls");
@@ -801,8 +803,8 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           // Image Post
-                          Image.network(postUrls[index]),
-                          // ImageGrid(imageUrls: postUrls, onImageClicked: (int i) => {}, onExpandClicked: () => {}),
+                          // Image.network(postUrls[index]),
+                          ImageGridDisplay(imageUrls: postUrls[index] as List<dynamic>, onImageClicked: (int i) => {print(postUrls[index])}, onExpandClicked: () => {print(postUrls[index])}, maxImages: 1),
                           // Footer Post
                           Row(
                             children: [
