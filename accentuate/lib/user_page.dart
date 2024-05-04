@@ -1,5 +1,6 @@
 
 import 'package:accentuate/components/my_image_grid.dart';
+import 'package:accentuate/components/my_image_list_page.dart';
 import 'package:accentuate/edit_profile_page.dart';
 import 'package:accentuate/followers_page.dart';
 import 'package:accentuate/private_outfits.dart';
@@ -315,8 +316,20 @@ class _UserPageState extends State<UserPage> {
                               (snapshot.data! as dynamic).docs[index];
 
                           return ImageGrid(imageUrls: snap['postUrl'], 
-                            onImageClicked: (int i) => {print('Clicked $i')}, 
-                            onExpandClicked: () => {print("Clicked!")},
+                            onImageClicked: (int i) => {Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageListPage(
+                                      imageUrls: snap['postUrl']),
+                                ),
+                              ),}, 
+                            onExpandClicked: () => {Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageListPage(
+                                      imageUrls: snap['postUrl']),
+                                ),
+                              ),},
                             maxImages: 1,
                           );
                         },

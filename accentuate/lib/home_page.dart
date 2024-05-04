@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:accentuate/components/my_image_grid.dart';
 import 'package:accentuate/components/my_image_grid_page.dart';
+import 'package:accentuate/components/my_image_list_page.dart';
 import 'package:accentuate/createoutfit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -804,7 +805,19 @@ class _HomePageState extends State<HomePage> {
                           ),
                           // Image Post
                           // Image.network(postUrls[index]),
-                          ImageGridDisplay(imageUrls: postUrls[index] as List<dynamic>, onImageClicked: (int i) => {print(postUrls[index])}, onExpandClicked: () => {print(postUrls[index])}, maxImages: 1),
+                          ImageGridDisplay(imageUrls: postUrls[index] as List<dynamic>, onImageClicked: (int i) => {Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageListPage(
+                                      imageUrls: postUrls[index]),
+                                ),
+                              ),}, onExpandClicked: () => {Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageListPage(
+                                      imageUrls: postUrls[index]),
+                                ),
+                              ),}, maxImages: 1),
                           // Footer Post
                           Row(
                             children: [
