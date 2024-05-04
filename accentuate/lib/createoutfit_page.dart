@@ -38,12 +38,12 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   }
 
   void selectedImages() async {
-    // final List<XFile> selectedImages = await imagePicker.pickMultiImage();
-    XFile? tempimage = await imagePicker.pickImage(source: ImageSource.gallery);
-    image = tempimage!;
-    // if(selectedImages.isNotEmpty){
-    //   imageFileList.addAll(selectedImages);
-    // }
+    final List<XFile> selectedImages = await imagePicker.pickMultiImage();
+    // XFile? tempimage = await imagePicker.pickImage(source: ImageSource.gallery);
+    // image = tempimage!;
+    if(selectedImages.isNotEmpty){
+      imageFileList.addAll(selectedImages);
+    }
     setState(() {
       
     });
@@ -110,30 +110,30 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
         child: Column(
           children: [
             Expanded(child: Padding(
-              // padding: const EdgeInsets.all(8.0),
-              // child: GridView.builder(
-              //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-              //   itemCount: imageFileList.length, 
-              //   itemBuilder: (BuildContext context, int index) { 
-              //     return Image.file(File(imageFileList[index].path), fit: BoxFit.cover,);
-              //     },
-              // ),
               padding: const EdgeInsets.all(8.0),
-              child:  image == null ? const SizedBox(height: 10.0) : Image.file(convertXFiletoFile(image)) 
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                itemCount: imageFileList.length, 
+                itemBuilder: (BuildContext context, int index) { 
+                  return Image.file(File(imageFileList[index].path), fit: BoxFit.cover,);
+                  },
+              ),
+              // padding: const EdgeInsets.all(8.0),
+              // child:  image == null ? const SizedBox(height: 10.0) : Image.file(convertXFiletoFile(image)) 
             )
             ),
             const SizedBox(height: 10.0,),
             
             MyButton(text: "Save Outfit", onTap: () => {
-              if(image == null){
+              if(imageFileList.isEmpty){
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select pictures to save.")))
               }
               else
               showDialog(context: context, builder: (context) => AlertDialog(
                 actions: [
-                  TextButton(onPressed: () {storeImage(false); Navigator.of(context).pop();}, 
+                  TextButton(onPressed: () {storeImages(false); Navigator.of(context).pop();}, 
                     child: const Text("Private")), 
-                  TextButton(onPressed: () {storeImage(true); Navigator.of(context).pop();}, 
+                  TextButton(onPressed: () {storeImages(true); Navigator.of(context).pop();}, 
                     child: const Text("Public"))
                 ],
                 title: const Text("Make Outfit Public?"),

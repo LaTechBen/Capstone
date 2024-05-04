@@ -1,4 +1,5 @@
 
+import 'package:accentuate/components/my_image_grid.dart';
 import 'package:accentuate/edit_profile_page.dart';
 import 'package:accentuate/followers_page.dart';
 import 'package:accentuate/private_outfits.dart';
@@ -10,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'dart:developer';
 import 'userPageImageDisplay.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 
 class UserPage extends StatefulWidget {
   // uid id required to know whose profile to show.
@@ -151,7 +153,7 @@ class _UserPageState extends State<UserPage> {
           )
         : Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color.fromARGB(255, 233, 30, 99),
+              backgroundColor: const Color.fromARGB(255, 248, 201, 205),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -312,24 +314,10 @@ class _UserPageState extends State<UserPage> {
                           DocumentSnapshot snap =
                               (snapshot.data! as dynamic).docs[index];
 
-                          return GestureDetector(
-                            child: SizedBox(
-                              child: Image(
-                                image: NetworkImage(
-                                  snap['postUrl'],
-                                ),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            onTap: () => {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UserPageImageDisplay(
-                                      imagePath: snap['postUrl']),
-                                ),
-                              ),
-                            },
+                          return ImageGrid(imageUrls: snap['postUrl'], 
+                            onImageClicked: (int i) => {print('Clicked $i')}, 
+                            onExpandClicked: () => {print("Clicked!")},
+                            maxImages: 1,
                           );
                         },
                       );
