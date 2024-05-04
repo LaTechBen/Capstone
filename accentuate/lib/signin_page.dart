@@ -55,13 +55,13 @@ class _SigninPageState extends State<SigninPage> {
 
   void goToForgotPassword(BuildContext context) {
     // temporary until forgot password page is created.
-    Navigator.push(
+    Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => ForgotPassword()));
   }
 
   void goToSignUp(BuildContext context) {
     // temporary
-    Navigator.push(
+    Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => SignupPage()));
   }
 
