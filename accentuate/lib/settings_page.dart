@@ -4,6 +4,7 @@ import 'personalinfo_page.dart';
 import 'accountinfo_page.dart';
 import 'home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'main.dart' as Main;
 
 /*void main() {
   runApp(const MyApp());
@@ -71,11 +72,9 @@ class SettingsBody extends StatelessWidget {
   }
 }
 
-
 void logout() async {
-    await FirebaseAuth.instance.signOut();
-  }
-
+  await FirebaseAuth.instance.signOut();
+}
 
 class SettingsButton extends StatelessWidget {
   final IconData icon;
@@ -102,7 +101,7 @@ class SettingsButton extends StatelessWidget {
           logout();
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SigninPage()),
+            MaterialPageRoute(builder: (context) => const Main.MyApp()),
           );
         }
       },

@@ -38,6 +38,7 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           loggedin = false;
         });
+        SigninPage();
       } else {
         print('User is signed in.');
         setState(() {
