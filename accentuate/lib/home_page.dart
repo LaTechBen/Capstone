@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:accentuate/components/my_image_grid.dart';
+import 'package:accentuate/components/my_image_grid_page.dart';
+import 'package:accentuate/components/my_image_list_page.dart';
 import 'package:accentuate/createoutfit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -416,6 +419,7 @@ class _HomePageState extends State<HomePage> {
     postUrls = [];
     userUrls = [];
     imgUrls = [];
+    descriptions = [];
     // Retrieve the image from Firebase Storage
     getImageUrl();
     // Fetch like counts and comments from Firestore
@@ -556,11 +560,13 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  late List<String> postUrls;
+  late List<dynamic> postUrls;
 
   late List<String> userUrls;
 
   late List<String> imgUrls;
+
+  late List<String> descriptions;
 
   Future<void> getImageUrl() async {
     setState(() {
@@ -588,12 +594,14 @@ class _HomePageState extends State<HomePage> {
       //print("Following Users: $followingUsers");
 
       // List to store post URLs
-      List<String> urls = [];
+      List<dynamic> urls = [];
 
       // List to store the user's profile image and user names
       List<String> profileImgs = [];
 
       List<String> userNames = [];
+
+      List<String> postDescs = [];
 
       // Iterate through each user that the current user is following
       for (String userId in followingUsers) {
@@ -605,20 +613,26 @@ class _HomePageState extends State<HomePage> {
 
         // Get documents from the posts collection
         QuerySnapshot postsSnapshot = await postsCollection.get();
-
         // Extract post URLs from the documents of the following user
-        List<String> userUrls = postsSnapshot.docs.map((doc) {
-          return doc['postUrl'] as String;
+        List<List<dynamic>> userUrls = postsSnapshot.docs.map((doc) {
+          return doc['postUrl'] as List<dynamic>;
         }).toList();
-
         // Extract username URLs from the documents of the following user
         List<String> usernameUrls = postsSnapshot.docs.map((doc) {
           return doc['username'] as String;
         }).toList();
 
+        List<String> descs = postsSnapshot.docs.map((doc) {
+          return doc['description'] as String;
+        }).toList();
+
+        print(descs);
+
         urls.addAll(userUrls);
 
         userNames.addAll(usernameUrls);
+
+        postDescs.addAll(descs);
 
         //List<String> profileImgUrls = postsSnapshot.docs.map().toList();
       }
@@ -626,6 +640,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         postUrls = urls;
         userUrls = userNames;
+        descriptions = postDescs;
         isLoading = false;
         //print("Post Urls: $postUrls");
       });
@@ -708,8 +723,8 @@ class _HomePageState extends State<HomePage> {
         : Scaffold(
             appBar: AppBar(
               title: Image.asset(
-                "images/logo.png",
-                height: 50,
+                "images/smallapplogo.png",
+                height: 70,
               ),
               leading: null,
               actions: [
@@ -723,14 +738,14 @@ class _HomePageState extends State<HomePage> {
                   },
                   icon: const Icon(Icons.add_circle_outline),
                 ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.favorite_border),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.chat_bubble_outline),
-                )
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.favorite_border),
+                // ),
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.chat_bubble_outline),
+                // )
               ],
             ),
             body: RefreshIndicator(
@@ -800,7 +815,32 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           // Image Post
-                          Image.network(postUrls[index]),
+                          // Image.network(postUrls[index]),
+                          ImageGridDisplay(
+                              imageUrls: postUrls[index] as List<dynamic>,
+                              onImageClicked: (int i) => {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ImageListPage(
+                                          imageUrls: postUrls[index],
+                                          description: descriptions[index],
+                                        ),
+                                      ),
+                                    ),
+                                  },
+                              onExpandClicked: () => {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ImageListPage(
+                                          imageUrls: postUrls[index],
+                                          description: descriptions[index],
+                                        ),
+                                      ),
+                                    ),
+                                  },
+                              maxImages: 1),
                           // Footer Post
                           Row(
                             children: [
@@ -867,10 +907,10 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 icon: Icon(Icons.comment_rounded),
                               ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.share_rounded),
-                              ),
+                              // IconButton(
+                              //   onPressed: () {},
+                              //   icon: Icon(Icons.share_rounded),
+                              // ),
                             ],
                           ),
 

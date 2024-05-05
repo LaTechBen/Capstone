@@ -31,7 +31,7 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void goToSignUserIn(BuildContext context){
-    Navigator.push(
+    Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => SigninPage()));
   }
 
@@ -124,7 +124,7 @@ bool isUsernameCompliant(String username){
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.pink[100],
+        backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: SafeArea(
               child: Center(
@@ -133,7 +133,7 @@ bool isUsernameCompliant(String username){
               const SizedBox(height: 10),
           
               // Logo
-              Image.asset('images/newLogo.png'),
+              Image.asset('images/signinlogo.png'),
           
               // padding
               const SizedBox(height: 10),

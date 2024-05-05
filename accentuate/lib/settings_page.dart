@@ -99,14 +99,15 @@ class SettingsButton extends StatelessWidget {
           );
         } else if (text == 'Log out') {
           logout();
-          Navigator.push(
+          Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const Main.MyApp()),
+            MaterialPageRoute(builder: (context) => SigninPage()),
+            (route) => false, // This line clears the entire navigation stack
           );
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.purpleAccent,
+        backgroundColor: Color.fromARGB(255, 248, 201, 205),
         foregroundColor: Colors.white,
       ),
       child: Padding(

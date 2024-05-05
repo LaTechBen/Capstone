@@ -32,7 +32,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   }
 
   void goToLoginPage(BuildContext context){
-    Navigator.push(
+    Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => SigninPage()));
   }
 
@@ -40,7 +40,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.pink[100],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: Column(
@@ -48,7 +48,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               const SizedBox(height: 50),
 
               // Logo
-              Image.asset('images/newLogo.png'),
+              Image.asset('images/signinlogo.png'),
 
               // padding
               const SizedBox(height: 25),

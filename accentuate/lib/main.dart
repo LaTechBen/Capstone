@@ -64,10 +64,12 @@ class _MyAppState extends State<MyApp> {
           appBarTheme: const AppBarTheme(
             elevation: 1,
             color: Colors.white,
-            iconTheme: IconThemeData(color: Colors.pink),
+            iconTheme: IconThemeData(color: Colors.black),
           ),
-          iconTheme: const IconThemeData(color: Colors.pink),
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
+          iconTheme: IconThemeData(color: Colors.black),
+          bottomAppBarTheme: BottomAppBarTheme(color: Color.fromARGB(255, 248, 201, 205)),
+          // canvasColor: Color.fromARGB(255, 248, 201, 205),
+          // colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 248, 201, 205), ),
           useMaterial3: true,
         ),
         // home: MyHomePage(
@@ -130,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
         // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Color.fromARGB(255, 248, 201, 205),
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
