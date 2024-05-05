@@ -4,7 +4,6 @@ import 'personalinfo_page.dart';
 import 'accountinfo_page.dart';
 import 'home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'main.dart' as Main;
 
 /*void main() {
   runApp(const MyApp());
