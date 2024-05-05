@@ -213,8 +213,8 @@ class _HomePageState extends State<HomePage> {
   // Method to handle like button press for a specific document by index
   void likeButtonPress(int index) async {
     // Get the reference to the post collection
-    CollectionReference postRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
+    CollectionReference postRef = FirebaseFirestore.instance
+        .collection('users/${followingList[index]}/posts');
 
     try {
       // Query for documents and get their snapshots
@@ -260,8 +260,8 @@ class _HomePageState extends State<HomePage> {
   // Method to handle unlike button press for a specific document by index
   void unlikeButtonPress(int index) async {
     // Get the reference to the post collection
-    CollectionReference postRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
+    CollectionReference postRef = FirebaseFirestore.instance
+        .collection('users/${followingList[index]}/posts');
 
     try {
       // Query for documents and get their snapshots
@@ -307,8 +307,8 @@ class _HomePageState extends State<HomePage> {
   // Method to handle adding a comment to a specific document by index
   void commentButtonPress(int index, String commentText) async {
     // Get the reference to the post collection
-    CollectionReference postRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
+    CollectionReference postRef = FirebaseFirestore.instance
+        .collection('users/${followingList[index]}/posts');
 
     try {
       // Query for documents and get their snapshots
@@ -418,6 +418,7 @@ class _HomePageState extends State<HomePage> {
     imageUrl = '';
     postUrls = [];
     userUrls = [];
+    followingList = [];
     imgUrls = [];
     descriptions = [];
     // Retrieve the image from Firebase Storage
@@ -562,6 +563,8 @@ class _HomePageState extends State<HomePage> {
 
   late List<dynamic> postUrls;
 
+  late List<String> followingList;
+
   late List<String> userUrls;
 
   late List<String> imgUrls;
@@ -603,6 +606,8 @@ class _HomePageState extends State<HomePage> {
 
       List<String> postDescs = [];
 
+      List<String> followersL = [];
+
       // Iterate through each user that the current user is following
       for (String userId in followingUsers) {
         // Get reference to the Firestore collection of posts of the following user
@@ -626,6 +631,14 @@ class _HomePageState extends State<HomePage> {
           return doc['description'] as String;
         }).toList();
 
+        List<String> followingAccounts = postsSnapshot.docs.map((doc) {
+          return doc['uid'] as String;
+        }).toList();
+
+        List<String> profilePic = userSnapshot.docs.map((doc) {
+          return doc['profileImage'] as String;
+        }).toList();
+
         print(descs);
 
         urls.addAll(userUrls);
@@ -634,13 +647,19 @@ class _HomePageState extends State<HomePage> {
 
         postDescs.addAll(descs);
 
+        followersL.addAll(followingAccounts);
+
+        profileImgs.addAll(profilePic);
+
         //List<String> profileImgUrls = postsSnapshot.docs.map().toList();
       }
 
       setState(() {
         postUrls = urls;
         userUrls = userNames;
+        imgUrls = profileImgs;
         descriptions = postDescs;
+        followingList = followersL;
         isLoading = false;
         //print("Post Urls: $postUrls");
       });
@@ -659,8 +678,8 @@ class _HomePageState extends State<HomePage> {
   void deleteComment(int postIndex, String commentText) async {
     try {
       // Get the reference to the post collection
-      CollectionReference postRef =
-          FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
+      CollectionReference postRef = FirebaseFirestore.instance
+          .collection('users/${followingList[postIndex]}/posts');
 
       // Query for documents and get their snapshots
       QuerySnapshot querySnapshot = await postRef.get();
@@ -773,8 +792,8 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   child: CircleAvatar(
                                     radius: 12,
-                                    backgroundImage: NetworkImage(userData[
-                                        'profileImage']), //AssetImage("images/test.jpg"
+                                    backgroundImage: NetworkImage(imgUrls[
+                                        index]), //AssetImage("images/test.jpg"
                                     //     //profileImages[index],
                                     //     ),
                                   ),
@@ -785,33 +804,33 @@ class _HomePageState extends State<HomePage> {
                                 //userData['username'],
                               ),
                               Spacer(),
-                              IconButton(
-                                onPressed: () {
-                                  // Logic here
-                                  // Open a dialog to show options including delete
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Options'),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                // Delete the post from Firebase
-                                                deletePost(index);
-                                              },
-                                              child: Text('Delete'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                icon: Icon(Icons.more_vert),
-                              )
+                              // IconButton(
+                              //   onPressed: () {
+                              //     // Logic here
+                              //     // Open a dialog to show options including delete
+                              //     showDialog(
+                              //       context: context,
+                              //       builder: (BuildContext context) {
+                              //         return AlertDialog(
+                              //           title: Text('Options'),
+                              //           content: Column(
+                              //             mainAxisSize: MainAxisSize.min,
+                              //             children: [
+                              //               TextButton(
+                              //                 onPressed: () {
+                              //                   // Delete the post from Firebase
+                              //                   deletePost(index);
+                              //                 },
+                              //                 child: Text('Delete'),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         );
+                              //       },
+                              //     );
+                              //   },
+                              //   icon: Icon(Icons.more_vert),
+                              // )
                             ],
                           ),
                           // Image Post
