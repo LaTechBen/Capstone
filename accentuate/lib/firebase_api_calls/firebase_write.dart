@@ -270,7 +270,7 @@ class Write {
   moveOutfitToPublicOrPrivate(String uid, DocumentSnapshot image, String previousLocation, String newLocation){
     Timestamp timestamp = image["datePublished"];
     DateTime time = timestamp.toDate();
-    Image newImage = Image(datePublished: time, description: image["description"] , likes: image["likes"], comments: image["comments"], postID: image["postID"], postUrl: image["postUrl"], uid: image["uid"], username: image["username"]);
+    
     try {
     _firebase.collection('users')
     .doc(uid)
@@ -278,7 +278,8 @@ class Write {
     .doc(image["postID"])
     .delete();
 
-    String postID = const Uuid().v1();
+String postID = const Uuid().v1();
+Images newImage = Images(datePublished: time, description: image["description"] , likes: image["likes"], comments: image["comments"], postID: postID, postUrl: image["postUrl"], uid: image["uid"], username: image["username"]);
     _firebase.collection('users')
     .doc(uid)
     .collection(newLocation)
@@ -286,7 +287,7 @@ class Write {
     .set(newImage.toJson());
 
     } catch (error) {
-      log(error.toString());
+      log("Hi" + error.toString());
     }
   }
 }

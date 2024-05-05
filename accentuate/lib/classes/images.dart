@@ -6,7 +6,7 @@ class Images {
   final likes;
   final comments;
   final String postID;
-  final List<String> postUrl;
+  final List<dynamic> postUrl;
   final String uid;
   final String username;
 
