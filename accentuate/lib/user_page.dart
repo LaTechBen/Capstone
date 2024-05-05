@@ -2,6 +2,7 @@
 import 'package:accentuate/components/my_image_grid.dart';
 import 'package:accentuate/components/my_image_list_page.dart';
 import 'package:accentuate/edit_profile_page.dart';
+import 'package:accentuate/firebase_api_calls/firebase_write.dart';
 import 'package:accentuate/followers_page.dart';
 import 'package:accentuate/private_outfits.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ class _UserPageState extends State<UserPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final Write _write = Write();
   var userData = {};
   var userProfile = {};
   var profImage;
@@ -94,14 +96,14 @@ class _UserPageState extends State<UserPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => PrivateOutfits(uid: _auth.currentUser?.uid)));
+            builder: (context) => PrivateOutfits(uid: _auth.currentUser?.uid))).whenComplete(() => getData());
   }
 
   gotoEditProfile(BuildContext context) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EditProfile(uid: _auth.currentUser?.uid)));
+            builder: (context) => EditProfile(uid: _auth.currentUser?.uid))).whenComplete(() => getData());
   }
 
   unFollowProfile(String? uid) async {
@@ -141,7 +143,7 @@ class _UserPageState extends State<UserPage> {
   }
 
   goToFollowersPage(BuildContext context){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => FollowersPage(uid: widget.uid)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => FollowersPage(uid: widget.uid))).whenComplete(() => getData());
   }
 
   @override
@@ -315,24 +317,43 @@ class _UserPageState extends State<UserPage> {
                           DocumentSnapshot snap =
                               (snapshot.data! as dynamic).docs[index];
 
-                          return ImageGrid(imageUrls: snap['postUrl'], 
-                            onImageClicked: (int i) => {Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ImageListPage(
-                                      imageUrls: snap['postUrl'],
-                                      description: snap['description'],),
-                                ),
-                              ),}, 
-                            onExpandClicked: () => {Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ImageListPage(
-                                      imageUrls: snap['postUrl'],
-                                      description: snap['description'],),
-                                ),
-                              ),},
-                            maxImages: 1,
+                          return GestureDetector(
+                            child: SizedBox(
+                              child: ImageGrid(imageUrls: snap['postUrl'], 
+                                onImageClicked: (int i) => {Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ImageListPage(
+                                          imageUrls: snap['postUrl'],
+                                          description: snap['description'],),
+                                    ),
+                                  ),}, 
+                                onExpandClicked: () => {Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ImageListPage(
+                                          imageUrls: snap['postUrl'],
+                                          description: snap['description'],),
+                                    ),
+                                  ),},
+                                maxImages: 1,
+                              ),
+                            ),
+                            onLongPress: () => {
+                              if(widget.uid == _auth.currentUser!.uid){
+                              showDialog(context: context, builder: (context) => AlertDialog(
+                              actions: [
+                              TextButton(onPressed: () {_write.deletePost(_auth.currentUser!.uid, snap, "posts"); Navigator.of(context).pop(); getData();}, 
+                                child: const Text("Delete")), 
+                              TextButton(onPressed: () {_write.moveOutfitToPublicOrPrivate(_auth.currentUser!.uid, snap,"posts", "outfits"); Navigator.of(context).pop(); getData();}, 
+                                child: const Text("Private"))
+                              ],
+                            title: const Text("Make Outfit Private?"),
+                            contentPadding: const EdgeInsets.all(15.0),
+                            content: const Text("Would like to delete your outfit or make it private?"),
+                            ))
+                              }
+                            },
                           );
                         },
                       );
