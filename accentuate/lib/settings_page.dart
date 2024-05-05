@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'personalinfo_page.dart';
 import 'accountinfo_page.dart';
 import 'home_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 /*void main() {
   runApp(const MyApp());
@@ -70,6 +71,10 @@ class SettingsBody extends StatelessWidget {
   }
 }
 
+void logout() async {
+  await FirebaseAuth.instance.signOut();
+}
+
 class SettingsButton extends StatelessWidget {
   final IconData icon;
   final String text;
@@ -79,7 +84,7 @@ class SettingsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         // Button Logic here
         if (text == 'Account Information') {
           Navigator.push(
@@ -92,6 +97,7 @@ class SettingsButton extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const PersonalInfoPage()),
           );
         } else if (text == 'Log out') {
+          logout();
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => SigninPage()),

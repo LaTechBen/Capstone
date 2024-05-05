@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:accentuate/firebase_options.dart';
 import 'package:accentuate/signin_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,8 +18,41 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription<User?> user;
+  late bool loggedin;
+
+  @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user == null) {
+        print('User is signed out.');
+        setState(() {
+          loggedin = false;
+        });
+        SigninPage();
+      } else {
+        print('User is signed in.');
+        setState(() {
+          loggedin = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    user.cancel();
+    super.dispose();
+  }
 
   // This widget is the root of your application.
   @override
@@ -36,13 +71,12 @@ class MyApp extends StatelessWidget {
           // canvasColor: Color.fromARGB(255, 248, 201, 205),
           // colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 248, 201, 205), ),
           useMaterial3: true,
-          
         ),
         // home: MyHomePage(
         //   title: "",
         // )
         // home: const UserPage(uid: 'qtdngM2pXSopCBDgC8zU')
-        home: SigninPage()
+        home: loggedin ? const MyHomePage(title: "") : SigninPage()
         //home: CreateOutfitPage()
         );
   }
@@ -88,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       body: currentPage == 2
-          ? SettingsPage()
+          ? const SettingsPage()
           : currentPage == 1
               ? SearchPage()
               : currentPage == 4
