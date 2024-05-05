@@ -738,14 +738,14 @@ class _HomePageState extends State<HomePage> {
                   },
                   icon: const Icon(Icons.add_circle_outline),
                 ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.favorite_border),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.chat_bubble_outline),
-                )
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.favorite_border),
+                // ),
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.chat_bubble_outline),
+                // )
               ],
             ),
             body: RefreshIndicator(
@@ -816,21 +816,31 @@ class _HomePageState extends State<HomePage> {
                           ),
                           // Image Post
                           // Image.network(postUrls[index]),
-                          ImageGridDisplay(imageUrls: postUrls[index] as List<dynamic>, onImageClicked: (int i) => {Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ImageListPage(
-                                      imageUrls: postUrls[index],
-                                      description: descriptions[index],),
-                                ),
-                              ),}, onExpandClicked: () => {Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ImageListPage(
-                                      imageUrls: postUrls[index],
-                                      description: descriptions[index],),
-                                ),
-                              ),}, maxImages: 1),
+                          ImageGridDisplay(
+                              imageUrls: postUrls[index] as List<dynamic>,
+                              onImageClicked: (int i) => {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ImageListPage(
+                                          imageUrls: postUrls[index],
+                                          description: descriptions[index],
+                                        ),
+                                      ),
+                                    ),
+                                  },
+                              onExpandClicked: () => {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ImageListPage(
+                                          imageUrls: postUrls[index],
+                                          description: descriptions[index],
+                                        ),
+                                      ),
+                                    ),
+                                  },
+                              maxImages: 1),
                           // Footer Post
                           Row(
                             children: [
@@ -897,10 +907,10 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 icon: Icon(Icons.comment_rounded),
                               ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.share_rounded),
-                              ),
+                              // IconButton(
+                              //   onPressed: () {},
+                              //   icon: Icon(Icons.share_rounded),
+                              // ),
                             ],
                           ),
 

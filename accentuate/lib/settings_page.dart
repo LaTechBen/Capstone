@@ -92,9 +92,10 @@ class SettingsButton extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const PersonalInfoPage()),
           );
         } else if (text == 'Log out') {
-          Navigator.push(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => SigninPage()),
+            (route) => false, // This line clears the entire navigation stack
           );
         }
       },
