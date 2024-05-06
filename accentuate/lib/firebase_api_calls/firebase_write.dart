@@ -290,4 +290,37 @@ Images newImage = Images(datePublished: time, description: image["description"] 
       log("Hi" + error.toString());
     }
   }
+
+  addOrRemoveLikeFromPost(bool isLike, Map<String, dynamic> post,  Map<String, String> likeObj) async {
+print(post['likes']);   
+    if(isLike){
+      (post['likes'] as List<dynamic>).add(likeObj);
+      print(post['likes']);
+      _firebase.collection("users").doc(post['uid']).collection('posts').doc(post['postID']).update({"likes": post['likes']});
+    }
+    if(!isLike){
+      (post['likes'] as List<dynamic>).removeWhere((item) => item['uid'] == likeObj['uid']);
+      print(post['likes']);
+      _firebase.collection("users").doc(post['uid']).collection('posts').doc(post['postID']).update({"likes": post['likes']});
+    }
+  }
+
+  addCommentFromPost(Map<String, dynamic> post, Map<String, String> comment) async {
+    print(post);
+    print(comment);
+
+      (post['comments'] as List<dynamic>).add(comment);
+      _firebase.collection('users').doc(post['uid']).collection('posts').doc(post['postID']).update({"comments" : post['comments']});
+
+
+  }
+
+  removeCommentFromPost(Map<String, dynamic> post, Map<String, dynamic> comment) async {
+
+    print(post);
+    print(comment);
+
+      (post['comments'] as List<dynamic>).remove(comment);
+      _firebase.collection('users').doc(post['uid']).collection('posts').doc(post['postID']).update({"comments" : post['comments']});
+  }
 }
