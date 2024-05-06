@@ -25,7 +25,8 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    _trendingPosts = getTrendingPosts();
+    //_trendingPosts = getTrendingPosts();
+    _searchPostResults = searchPosts("");
   }
 
   Future<List<DocumentSnapshot>> getTrendingPosts() async {
