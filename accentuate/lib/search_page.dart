@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:accentuate/user_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -30,35 +29,32 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<List<DocumentSnapshot>> getTrendingPosts() async {
-    final snapshot = await _firebase.collection('posts').orderBy('likes', descending: true).limit(25).get();
-    return snapshot.docs;
+  final snapshot = await _firebase.collectionGroup('posts').orderBy('likesCount', descending: true).limit(25).get();
+  return snapshot.docs;
+}
+
+Future<List<DocumentSnapshot>> searchPosts(String query) async {
+  final snapshot = await _firebase.collectionGroup('posts').get();
+  List<DocumentSnapshot> posts = snapshot.docs;
+
+  if (query.isNotEmpty) {
+    posts = posts.where((post) {
+      var description = (post.data() as Map<String, dynamic>)['description'];
+      double score = _calculateRelevanceScore(description ?? '', query); 
+      return score > 0.5; 
+    }).toList();
+
+    posts.sort((a, b) {
+      var descriptionA = (a.data() as Map<String, dynamic>)['description'];
+      var descriptionB = (b.data() as Map<String, dynamic>)['description'];
+      double scoreA = _calculateRelevanceScore(descriptionA ?? '', query);
+      double scoreB = _calculateRelevanceScore(descriptionB ?? '', query);
+      return scoreB.compareTo(scoreA);
+    });
   }
 
-  Future<List<DocumentSnapshot>> searchPosts(String query) async {
-    final snapshot = await _firebase.collection('posts').get();
-    List<DocumentSnapshot> posts = snapshot.docs;
-
-    // Handle Null Case and Weight
-    if (query.isNotEmpty) {
-      posts = posts.where((post) {
-        var description = (post.data() as Map<String, dynamic>)['description'];
-        double score = _calculateRelevanceScore(description ?? '', query); 
-        return score > 0.5; 
-      }).toList();
-      
-      // Sort Post Based on Relevance Score
-      posts.sort((a, b) {
-        var descriptionA = (a.data() as Map<String, dynamic>)['description'];
-        var descriptionB = (b.data() as Map<String, dynamic>)['description'];
-        double scoreA = _calculateRelevanceScore(descriptionA ?? '', query);
-        double scoreB = _calculateRelevanceScore(descriptionB ?? '', query);
-        return scoreB.compareTo(scoreA);
-      });
-    }
-
-    // Limit Results to 25 'posts'
-    return posts.take(25).toList();
-  }
+  return posts.take(25).toList();
+}
 
   Future<List<DocumentSnapshot>> getUsers(String query) async {
     final snapshot = await _firebase.collection('users').get();
@@ -68,8 +64,8 @@ class _SearchPageState extends State<SearchPage> {
     if (query.isNotEmpty) {
       users = users.where((user) {
         var username = (user.data() as Map<String, dynamic>)['username'];
-        double score = _calculateRelevanceScore(username ?? '', query); // Handle null username
-        return score > 0.5; // You can adjust the threshold as needed
+        double score = _calculateRelevanceScore(username ?? '', query); 
+        return score > 0.5; 
       }).toList();
     }
 
@@ -89,11 +85,28 @@ class _SearchPageState extends State<SearchPage> {
 
     goToUserPage(BuildContext context, DocumentSnapshot<Object?> uid){
     String userUid = uid.reference.id;
-    log("HERE");
-    log(userUid);
     Navigator.push(context, MaterialPageRoute(builder: (context) => UserPage(uid: userUid)));
   }
+  
+   Widget _buildPostItem(DocumentSnapshot postSnapshot) {
+    var post = postSnapshot.data() as Map<String, dynamic>;
+    var postUrls = post['postUrl'] as List<dynamic>;
+    String imageUrl = postUrls.isNotEmpty ? postUrls[0] : ''; 
+    int likesCount = (post['likes'] as List).length; // Count the likes
 
+    return Image.network(imageUrl, fit: BoxFit.cover);
+  }
+
+  Widget _buildUserItem(DocumentSnapshot userSnapshot) {
+    var user = userSnapshot.data() as Map<String, dynamic>;
+    var username = user['username'] ?? ''; 
+
+    return ListTile(
+      title: Text(username),
+      onTap: () => goToUserPage(context, userSnapshot),                               
+    );
+  }
+  
   // Format and UI Elements
   @override
   Widget build(BuildContext context) {
@@ -169,10 +182,7 @@ class _SearchPageState extends State<SearchPage> {
                               ),
                               itemCount: posts.length,
                               itemBuilder: (context, index) {
-                               
-
-                                var data = posts[index].data() as Map<String, dynamic>;
-                                return Image.network(data['postUrl'], fit: BoxFit.cover);
+                                return _buildPostItem(posts[index]);
                               },
                             );
                           },
@@ -211,12 +221,7 @@ class _SearchPageState extends State<SearchPage> {
                             return ListView.builder(
                               itemCount: users.length,
                               itemBuilder: (context, index) {
-                                // Handle Null 'username'
-                                var username = (users[index].data() as Map<String, dynamic>?)?['username'] ?? ''; 
-                                return ListTile(
-                                  title: Text(username),
-                                  onTap: () => goToUserPage(context, users[index]),                               
-                                );
+                                return _buildUserItem(users[index]);
                               },
                             );
                           },
@@ -230,6 +235,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 }
+
 
 void main() {
   runApp(MaterialApp(
