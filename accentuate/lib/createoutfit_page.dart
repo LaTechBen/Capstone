@@ -163,7 +163,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
             const SizedBox(
               height: 10.0,
             ),
-            MyButton(text: "Choose Pictures", onTap: getTest),
+            MyButton(text: "Choose Pictures", onTap: selectedImages),
             const SizedBox(
               height: 10.0,
             )
