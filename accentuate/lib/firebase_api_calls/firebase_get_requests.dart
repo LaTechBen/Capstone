@@ -29,4 +29,22 @@ class FirebaseGet {
 
 
     }
+
+    Future<List<Map<String, dynamic>>> getFollowingPosts() async {
+      var followingList = await _firestore.collection('users').doc(_auth.currentUser!.uid).get();
+
+      var followings = (followingList.data()!['following']);
+      List<Map<String, dynamic>> list = [];
+
+      for(String followee in followings){
+
+        var followingPosts = await _firestore.collection('users').doc(followee).collection('posts').get();
+
+       followingPosts.docs.forEach(
+        (e) => list.add(e.data())
+        );
+
+      }
+     return(list);
+    }
 }

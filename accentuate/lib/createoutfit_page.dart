@@ -1,5 +1,6 @@
 import 'package:accentuate/components/my_button.dart';
 import 'package:accentuate/components/my_textfield.dart';
+import 'package:accentuate/firebase_api_calls/firebase_get_requests.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,6 +25,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
   final Write _write = Write();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseGet _get = FirebaseGet();
   var userdata = {};
   ImagePicker imagePicker = ImagePicker();
   List<XFile> imageFileList = [];
@@ -50,6 +52,10 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
       
     });
 
+  }
+
+  getTest() async {
+    _get.getFollowingPosts();
   }
 
   getData() async {
@@ -157,7 +163,7 @@ class _CreateOutfitPageState extends State<CreateOutfitPage> {
             const SizedBox(
               height: 10.0,
             ),
-            MyButton(text: "Choose Pictures", onTap: selectedImages),
+            MyButton(text: "Choose Pictures", onTap: getTest),
             const SizedBox(
               height: 10.0,
             )

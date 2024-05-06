@@ -3,7 +3,9 @@ import 'package:accentuate/components/my_image_grid.dart';
 import 'package:accentuate/components/my_image_grid_page.dart';
 import 'package:accentuate/components/my_image_list_page.dart';
 import 'package:accentuate/createoutfit_page.dart';
+import 'package:accentuate/firebase_api_calls/firebase_get_requests.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'firebase_api_calls/firebase_write.dart';
@@ -48,36 +50,16 @@ class _HomePageState extends State<HomePage> {
   // Get a reference to storage root
   Reference referenceRoot = FirebaseStorage.instance.ref();
 
+  TextEditingController _commentController = TextEditingController();
+
   // Initialize Firebase Storage reference
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseGet _get = FirebaseGet();
+  final Write _write = Write();
 
-  // Reference to the user
-  Future<String> findUserDocumentByUsername(String username) async {
-    try {
-      final userReference = FirebaseFirestore.instance.collection('users');
-
-      // Query the collection to find documents where the 'username' field matches the desiredUsername
-      QuerySnapshot querySnapshot =
-          await userReference.where('username', isEqualTo: username).get();
-
-      // Check if any documents were found
-      if (querySnapshot.docs.isNotEmpty) {
-        // Access the first document that matches the query
-        DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
-        // Access the 'uid' field from the document snapshot and return it
-        return documentSnapshot.get('uid') as String;
-      } else {
-        // No document found with the given username
-        return 'User not found';
-      }
-    } catch (e) {
-      // Error occurred
-      print('Error finding user document: $e');
-      return 'Error';
-    }
-  }
+  String currUsername = "";
 
   // Reference from the users post
   final postReference = FirebaseFirestore.instance
@@ -107,290 +89,46 @@ class _HomePageState extends State<HomePage> {
     "images/p9.jpg",
   ];
 
-  // Map to store like counts for each post index
-  Map<int, int> likeCounts = {
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-    7: 0,
-    8: 0,
-    9: 0,
-    10: 0,
-  };
 
-  // Map to store comments for each post index
-  Map<int, List<String>> commentsMap = {
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-    7: [],
-    8: [],
-    9: [],
-    10: [],
-  };
-
-  TextEditingController commentController = TextEditingController();
-
-  // Maintain a list to keep track of the pressed state for each posts
-  List<bool> isLiked = List.filled(10, false);
-
-  // Checking if the user already liked the post
-  Future<bool> userLiked(int index) async {
-    // Get the reference to the post collection
-    CollectionReference colRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
-
-    // Query for documents and get their snapshots
-    QuerySnapshot qss = await colRef.get();
-
-    // Check if the index is within the bounds of retrieved documents
-    if (index >= 0 && index < qss.size) {
-      // Access the document snapshot at the specified index
-      DocumentSnapshot dss = qss.docs[index];
-
-      // Access the data of the document
-      Map<String, dynamic> d = dss.data() as Map<String, dynamic>;
-
-      if (d.containsKey('likes')) {
-        // Access the "likes" field
-        List<dynamic> ulikes = d['likes'];
-
-        // Check if the user's uid is already in the likes array
-        if (ulikes.contains(widget.uid)) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-
-    // Ensure a consistent return value if the conditions are not met
-    return false;
-  }
-
-  Future<bool> uLiked(int index) async {
-    return await userLiked(index);
-  }
-
-  // Method to handle like button press
-  void handleLikeButtonPress(int index) {
-    setState(() {
-      // Toggle the state of the icon when it's pressed
-      isLiked[index] = !isLiked[index];
-      // Initialize the like count if it's null
-      likeCounts[index] ??= 0;
-      // Increment like count for the specified post index if it's liked
-      if (isLiked[index]) {
-        // Increment like count for the specified post index
-        likeCounts[index] = likeCounts[index]! + 1;
-      } else {
-        likeCounts[index] = likeCounts[index]! - 1;
-      }
-    });
-  }
-
-  // Method to handle adding a comment
-  void handleCommentButtonPress(int index) {
-    setState(() {
-      String comment = commentController.text;
-      if (comment.isNotEmpty) {
-        // Ensure commentsMap[index] is not null before adding the comment
-        commentsMap[index] ??= [];
-        commentsMap[index]!.add(comment);
-        commentController.clear();
-      }
-    });
-  }
-
-  /* NEW LIKE AND COMMENT HANDLER */
-
-  // Method to handle like button press for a specific document by index
-  void likeButtonPress(int index) async {
-    // Get the reference to the post collection
-    CollectionReference postRef = FirebaseFirestore.instance
-        .collection('users/${followingList[index]}/posts');
-
-    try {
-      // Query for documents and get their snapshots
-      QuerySnapshot querySnapshot = await postRef.get();
-
-      // Check if the index is within the bounds of retrieved documents
-      if (index >= 0 && index < querySnapshot.size) {
-        // Access the document snapshot at the specified index
-        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
-
-        // Access the data of the document
-        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-
-        if (data.containsKey('likes')) {
-          // Access the "likes" field
-          List<dynamic> likes = data['likes'];
-
-          // Add the user's UID to the "likes" array if it's not already present
-          if (!likes.contains(widget.uid)) {
-            likes.add(widget.uid);
-            // updating the isLiked array
-            //userLiked[index] = true;
-            // Update the document in Firestore with the modified "likes" array
-            await docSnapshot.reference.update({'likes': likes});
-            print(
-                'User UID added to likes array in document: ${docSnapshot.id}');
-          } else {
-            print(
-                'User UID already exists in likes array in document: ${docSnapshot.id}');
-          }
-        } else {
-          // Handle the case where the document does not contain the "likes" field
-          print('Document does not contain the "likes" field');
-        }
-      } else {
-        print('Invalid index: $index');
-      }
-    } catch (e) {
-      print('Error liking post: $e');
+  updateLikes(bool isLike, Map<String, dynamic> post) async {
+    try{
+         Map<String, String> obj = {
+         "uid": _auth.currentUser!.uid,
+         "username": currUsername
+         } ;
+      _write.addOrRemoveLikeFromPost(!isLike, post, obj);
+      setState(() {});
+    } catch(e) {
+      print("LIKES ERROR: " + e.toString());
     }
   }
 
-  // Method to handle unlike button press for a specific document by index
-  void unlikeButtonPress(int index) async {
-    // Get the reference to the post collection
-    CollectionReference postRef = FirebaseFirestore.instance
-        .collection('users/${followingList[index]}/posts');
-
-    try {
-      // Query for documents and get their snapshots
-      QuerySnapshot querySnapshot = await postRef.get();
-
-      // Check if the index is within the bounds of retrieved documents
-      if (index >= 0 && index < querySnapshot.size) {
-        // Access the document snapshot at the specified index
-        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
-
-        // Access the data of the document
-        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-
-        if (data.containsKey('likes')) {
-          // Access the "likes" field
-          List<dynamic> likes = data['likes'];
-
-          // Remove the user's UID from the "likes" array if it's present
-          if (likes.contains(widget.uid)) {
-            likes.remove(widget.uid);
-            likeCounts[index]! - 1;
-
-            // Update the document in Firestore with the modified "likes" array
-            await docSnapshot.reference.update({'likes': likes});
-            print(
-                'User UID removed from likes array in document: ${docSnapshot.id}');
-          } else {
-            print(
-                'User UID does not exist in likes array in document: ${docSnapshot.id}');
-          }
-        } else {
-          // Handle the case where the document does not contain the "likes" field
-          print('Document does not contain the "likes" field');
-        }
-      } else {
-        print('Invalid index: $index');
-      }
-    } catch (e) {
-      print('Error unliking post: $e');
+  addComments(Map<String, dynamic> post, Map<String, String> comment){
+    try{
+      _write.addCommentFromPost(post, comment);
+      _commentController.clear();
+      setState(() {});
+    } catch (e){
+      print("COMMENTS ERROR" + e.toString());
     }
   }
 
-  // Method to handle adding a comment to a specific document by index
-  void commentButtonPress(int index, String commentText) async {
-    // Get the reference to the post collection
-    CollectionReference postRef = FirebaseFirestore.instance
-        .collection('users/${followingList[index]}/posts');
+  removeComments(Map<String, dynamic> post, Map<String, dynamic> comment) {
+    try{
+      _write.removeCommentFromPost(post, comment);
+      setState(() {});
+    } catch (e){
+      print("REMOVE COMMENTS ERROR" + e.toString());
 
-    try {
-      // Query for documents and get their snapshots
-      QuerySnapshot querySnapshot = await postRef.get();
-
-      // Check if the index is within the bounds of retrieved documents
-      if (index >= 0 && index < querySnapshot.size) {
-        // Access the document snapshot at the specified index
-        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
-
-        // Access the data of the document
-        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-
-        // Access the "comments" field
-        List<dynamic> comments = data['comments'];
-
-        // Add the user's comment along with their UID to the "comments" array
-        comments.add({
-          'uid': widget.uid,
-          'comment': commentText, // The text of the user's comment
-        });
-
-        // Update the document in Firestore with the modified "comments" array
-        await docSnapshot.reference.update({'comments': comments});
-
-        print('Comment added successfully to document: ${docSnapshot.id}');
-      } else {
-        print('Invalid index: $index');
-      }
-    } catch (e) {
-      print('Error adding comment: $e');
     }
   }
-
-  // delete post method
-  // Method to delete a post by index
-  void deletePost(int index) async {
-    // Get the reference to the post collection
-    CollectionReference postRef =
-        FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
-
-    try {
-      // Query for documents and get their snapshots
-      QuerySnapshot querySnapshot = await postRef.get();
-
-      // Check if the index is within the bounds of retrieved documents
-      if (index >= 0 && index < querySnapshot.size) {
-        // Access the document snapshot at the specified index
-        DocumentSnapshot docSnapshot = querySnapshot.docs[index];
-
-        // Ensure the document snapshot exists
-        if (docSnapshot.exists) {
-          // Delete the document from Firestore using its path
-          await FirebaseFirestore.instance
-              .doc(docSnapshot.reference.path)
-              .delete();
-
-          print('Post deleted successfully.');
-
-          // Fetch like counts and comments from Firestore
-          fetchLikeCountsAndComments();
-
-          // Close the dialog
-          Navigator.pop(context);
-        } else {
-          print('Document does not exist.');
-        }
-      } else {
-        print('Invalid index: $index');
-      }
-    } catch (e) {
-      print('Error deleting post: $e');
-    }
-  }
-
   /* ENDS HERE */
 
   Future<void> onRefresh() async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 3));
 
     // Fetch like counts and comments from Firestore
-    fetchLikeCountsAndComments();
+    setState(() {});
   }
 
   File? _selectedImage;
@@ -421,6 +159,8 @@ class _HomePageState extends State<HomePage> {
     followingList = [];
     imgUrls = [];
     descriptions = [];
+    followingPostsList = [];
+
     // Retrieve the image from Firebase Storage
     getImageUrl();
     // Fetch like counts and comments from Firestore
@@ -430,130 +170,14 @@ class _HomePageState extends State<HomePage> {
   // Method to fetch like counts and comments from Firestore
   void fetchLikeCountsAndComments() async {
     try {
-      // getting reference to the profileImage
-      var userSnap = await _firestore.collection('users').doc(widget.uid).get();
+      List<Map<String, dynamic>> followingPosts2 = await _get.getFollowingPosts();
+      followingPostsList.addAll(followingPosts2);
+      print(followingPostsList);
 
-      userData = userSnap.data()!;
+      var snaps = await _firestore.collection('users').doc(_auth.currentUser!.uid).get();
+      currUsername = (snaps.data()!['username']);
 
-      // adding 'posts' as a subcollection to each user
-
-      // Get a reference to the 'users' collection
-      CollectionReference usersCollection =
-          FirebaseFirestore.instance.collection('users');
-
-      // Get all documents from the 'users' collection
-      QuerySnapshot usersSnapshot = await usersCollection.get();
-
-      // Create a batched write operation
-      WriteBatch batch = FirebaseFirestore.instance.batch();
-
-      // Iterate through each document in the 'users' collection
-      for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
-        // Get the reference to the 'posts' subcollection for the current user
-        CollectionReference postsCollection =
-            userDoc.reference.collection('posts');
-
-        // Check if the 'posts' subcollection exists
-        QuerySnapshot postsSnapshot = await postsCollection.limit(1).get();
-
-        // If the 'posts' subcollection doesn't exist, create it
-        if (postsSnapshot.docs.isEmpty) {
-          // Generate a unique document ID for a sample post document
-          String postId =
-              FirebaseFirestore.instance.collection('posts').doc().id;
-        }
-      }
-
-      // Commit the batched write operation
-      await batch.commit();
-
-      print('Subcollections created successfully.');
-
-      // ENDS HERE
-      // Get the reference to the post collection
-      CollectionReference postRef =
-          FirebaseFirestore.instance.collection('users/${widget.uid}/posts');
-
-      // Get the reference to the users collection
-      CollectionReference userRef =
-          FirebaseFirestore.instance.collection('users');
-
-      // Retrieve all the documents within the collection
-      QuerySnapshot userSnapshot = await userRef.get();
-
-      // Retrieve all documents within the collection
-      QuerySnapshot querySnapshot = await postRef.get();
-
-      // Iterate over the documents within the collection
-      for (int index = 0; index < querySnapshot.docs.length; index++) {
-        // Access the document snapshot at the current index
-        DocumentSnapshot doc = querySnapshot.docs[index];
-
-        // Access the data of each document
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        // Ensure the document contains the "comments" field and it's an array
-        if (!data.containsKey('comments') || !(data['comments'] is List)) {
-          // Add a new empty "comments" array to the document
-          await doc.reference.update({'comments': []});
-          // Update the data variable to include the empty "comments" array
-          data['comments'] = [];
-        }
-
-        // Calculate the size of the 'likes' array
-        int likesCount =
-            data.containsKey('likes') ? (data['likes'] as List).length : 0;
-
-        // Store the like count in the likeCounts map with the index as the key
-        likeCounts[index] = likesCount;
-        if (likeCounts[index] != 0) {
-          isLiked[index] = true;
-        }
-
-        // Retrieve comments for the current post
-        List<dynamic> commentsData =
-            data.containsKey('comments') ? data['comments'] : [];
-        List<String> commentTexts = [];
-
-// Iterate over each comment data and extract the comment text
-        for (var commentData in commentsData) {
-          if (commentData is Map<String, dynamic> &&
-              commentData.containsKey('comment')) {
-            commentTexts.add(commentData['comment'] as String);
-          }
-        }
-
-// Store comments for the current post in the commentsMap with the index as the key
-        commentsMap[index] = commentTexts;
-      }
-
-      //
-      for (int index = 0; index < userSnapshot.docs.length; index++) {
-        // Access the document snapshot at the current index
-        DocumentSnapshot userdoc = userSnapshot.docs[index];
-
-        // Access the data of each document
-        Map<String, dynamic> userdata = userdoc.data() as Map<String, dynamic>;
-
-        // Ensure the document contains the "following" field and it's an array
-        if (!userdata.containsKey('following') ||
-            !(userdata['following'] is List)) {
-          // Add a new empty "following" array to the document
-          await userdoc.reference.update({'following': []});
-          // Update the data variable to include the empty "comments" array
-          userdata['following'] = [];
-        }
-
-        // Ensure the document contains the "followers" field and it's an array
-        if (!userdata.containsKey('followers') ||
-            !(userdata['followers'] is List)) {
-          // Add a new empty "followers" array to the document
-          await userdoc.reference.update({'followers': []});
-          // Update the data variable to include the empty "comments" array
-          userdata['followers'] = [];
-        }
-      }
-
+      //print(followingPostsList);
       // Update the UI to reflect the changes
       setState(() {});
     } catch (e) {
@@ -570,6 +194,8 @@ class _HomePageState extends State<HomePage> {
   late List<String> imgUrls;
 
   late List<String> descriptions;
+
+  late List<Map<String, dynamic>> followingPostsList;
 
   Future<void> getImageUrl() async {
     setState(() {
@@ -639,7 +265,7 @@ class _HomePageState extends State<HomePage> {
           return doc['profileImage'] as String;
         }).toList();
 
-        print(descs);
+        //print(descs);
 
         urls.addAll(userUrls);
 
@@ -650,7 +276,9 @@ class _HomePageState extends State<HomePage> {
         followersL.addAll(followingAccounts);
 
         profileImgs.addAll(profilePic);
-
+        //print(urls);
+        //print(followersL);
+        //print(userNames);
         //List<String> profileImgUrls = postsSnapshot.docs.map().toList();
       }
 
@@ -674,64 +302,6 @@ class _HomePageState extends State<HomePage> {
   late String imageUrl = '';
   late String profileUrl = '';
   final storage = FirebaseStorage.instance;
-
-  void deleteComment(int postIndex, String commentText) async {
-    try {
-      // Get the reference to the post collection
-      CollectionReference postRef = FirebaseFirestore.instance
-          .collection('users/${followingList[postIndex]}/posts');
-
-      // Query for documents and get their snapshots
-      QuerySnapshot querySnapshot = await postRef.get();
-
-      // Check if the postIndex is within the bounds of retrieved documents
-      if (postIndex >= 0 && postIndex < querySnapshot.size) {
-        // Access the document snapshot at the specified index
-        DocumentSnapshot docSnapshot = querySnapshot.docs[postIndex];
-
-        // Ensure the document snapshot exists
-        if (docSnapshot.exists) {
-          // Get the data of the document
-          Map<String, dynamic> data =
-              docSnapshot.data() as Map<String, dynamic>;
-
-          // Get the comments array
-          List<dynamic> comments = data['comments'];
-
-          // Find the index of the comment to be deleted
-          int commentIndex = comments
-              .indexWhere((comment) => comment['comment'] == commentText);
-
-          // Ensure the comment exists in the comments array
-          if (commentIndex != -1) {
-            // Get the UID of the comment author
-            String commentAuthorUid = comments[commentIndex]['uid'];
-
-            // Check if the comment belongs to the current user
-            if (commentAuthorUid == widget.uid) {
-              // Remove the comment from the comments array
-              comments.removeAt(commentIndex);
-
-              // Update the document in Firestore with the modified comments array
-              await docSnapshot.reference.update({'comments': comments});
-
-              print('Comment deleted successfully.');
-            } else {
-              print('You can only delete your own comments.');
-            }
-          } else {
-            print('Comment not found.');
-          }
-        } else {
-          print('Document does not exist.');
-        }
-      } else {
-        print('Invalid index: $postIndex');
-      }
-    } catch (e) {
-      print('Error deleting comment: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -757,14 +327,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   icon: const Icon(Icons.add_circle_outline),
                 ),
-                // IconButton(
-                //   onPressed: () {},
-                //   icon: const Icon(Icons.favorite_border),
-                // ),
-                // IconButton(
-                //   onPressed: () {},
-                //   icon: const Icon(Icons.chat_bubble_outline),
-                // )
+
               ],
             ),
             body: RefreshIndicator(
@@ -776,7 +339,7 @@ class _HomePageState extends State<HomePage> {
                   Divider(),
                   Column(
                     children: List.generate(
-                      postUrls.length,
+                      followingPostsList.length,
                       (index) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -800,50 +363,22 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Text(
-                                userUrls[index],
+                                followingPostsList[index]['username'],
                                 //userData['username'],
                               ),
                               Spacer(),
-                              // IconButton(
-                              //   onPressed: () {
-                              //     // Logic here
-                              //     // Open a dialog to show options including delete
-                              //     showDialog(
-                              //       context: context,
-                              //       builder: (BuildContext context) {
-                              //         return AlertDialog(
-                              //           title: Text('Options'),
-                              //           content: Column(
-                              //             mainAxisSize: MainAxisSize.min,
-                              //             children: [
-                              //               TextButton(
-                              //                 onPressed: () {
-                              //                   // Delete the post from Firebase
-                              //                   deletePost(index);
-                              //                 },
-                              //                 child: Text('Delete'),
-                              //               ),
-                              //             ],
-                              //           ),
-                              //         );
-                              //       },
-                              //     );
-                              //   },
-                              //   icon: Icon(Icons.more_vert),
-                              // )
+
                             ],
                           ),
-                          // Image Post
-                          // Image.network(postUrls[index]),
                           ImageGridDisplay(
-                              imageUrls: postUrls[index] as List<dynamic>,
+                              imageUrls: followingPostsList[index]['postUrl'] as List<dynamic>,
                               onImageClicked: (int i) => {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => ImageListPage(
-                                          imageUrls: postUrls[index],
-                                          description: descriptions[index],
+                                          imageUrls: followingPostsList[index]['postUrl'],
+                                          description: followingPostsList[index]['description'],
                                         ),
                                       ),
                                     ),
@@ -853,8 +388,8 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => ImageListPage(
-                                          imageUrls: postUrls[index],
-                                          description: descriptions[index],
+                                          imageUrls: followingPostsList[index]['postUrl'],
+                                          description: followingPostsList[index]['description'],
                                         ),
                                       ),
                                     ),
@@ -865,17 +400,15 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               IconButton(
                                 onPressed: () {
-                                  handleLikeButtonPress(index);
-                                  isLiked[index]
-                                      ? likeButtonPress(index)
-                                      : unlikeButtonPress(index);
+                                  print((followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid));
+                                  updateLikes((followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid), followingPostsList[index]);
                                 },
                                 icon: Icon(
-                                  isLiked[index]
+                                  (followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid)
                                       ? Icons.favorite
                                       : Icons.favorite_border,
                                   // Update the color based on the isLiked state
-                                  color: isLiked[index] ? Colors.red : null,
+                                  color: (followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid) ? Colors.red : null,
                                 ),
                               ),
                               IconButton(
@@ -887,7 +420,7 @@ class _HomePageState extends State<HomePage> {
                                       return AlertDialog(
                                         title: Text('Add Comment'),
                                         content: TextField(
-                                          controller: commentController,
+                                          controller: _commentController,
                                           decoration: InputDecoration(
                                             hintText: 'Enter your comment',
                                           ),
@@ -902,20 +435,21 @@ class _HomePageState extends State<HomePage> {
                                           TextButton(
                                             onPressed: () {
                                               // Handle adding a comment
-                                              handleCommentButtonPress(index);
-                                              Navigator.of(context).pop();
-                                              // Ensure commentsMap[index] is not null before adding the comment
-                                              commentsMap[index] ??= [];
-                                              List<String>? comment =
-                                                  commentsMap[index];
-                                              if (comment != null) {
-                                                for (var com in comment) {
-                                                  commentButtonPress(
-                                                      index, com);
-                                                }
+                                              String comm = _commentController.text;
+                                              print(comm);
+                                              if(comm.isNull || comm.isEmpty){
+                                                const snackbar = SnackBar(content: Text("Please leave a comment before adding."));
+                                                ScaffoldMessenger.of(context).showSnackBar(snackbar);
                                               }
-
-                                              //commentButtonPress(index, commentsMap[index]);
+                                              else{
+                                              Map<String, String> obj = {
+                                                  "comment": comm,
+                                                  "uid": _auth.currentUser!.uid,
+                                                  "username": currUsername
+                                                } ;
+                                                addComments(followingPostsList[index], obj);
+                                                Navigator.of(context).pop();
+                                              }
                                             },
                                             child: Text('Add'),
                                           ),
@@ -926,10 +460,6 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 icon: Icon(Icons.comment_rounded),
                               ),
-                              // IconButton(
-                              //   onPressed: () {},
-                              //   icon: Icon(Icons.share_rounded),
-                              // ),
                             ],
                           ),
 
@@ -944,50 +474,19 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         TextSpan(text: "Liked by"),
                                         TextSpan(
-                                          text: likeCounts[index] == 0
-                                              ? " "
-                                              : " ${userData['username']}",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: likeCounts[index] == 0
-                                              ? " "
-                                              : " and",
-                                        ),
-                                        TextSpan(
-                                          text: likeCounts[index] == 0
-                                              ? " "
-                                              : " ${likeCounts[index]} others",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ]),
+                                          text: (followingPostsList[index]['likes'] as List).length == 0
+                                              ? " no one."
+                                              : (followingPostsList[index]['likes'] as List).length == 1
+
+                                              ? " ${followingPostsList[index]['likes'][0]['username']}" :" ${followingPostsList[index]['likes'][0]['username']}" + " and " + "${(followingPostsList[index]['likes'] as List).length - 1}" + " other(s)",
+                                          
+                                )
+                                ]),
                                 ),
-                                // RichText(
-                                //   text: TextSpan(
-                                //       style: TextStyle(color: Colors.black),
-                                //       children: [
-                                //         TextSpan(
-                                //           text: " Profile Name",
-                                //           style: TextStyle(
-                                //             fontWeight: FontWeight.bold,
-                                //           ),
-                                //         ),
-                                //         TextSpan(
-                                //             text: " This is an amazing fit"),
-                                //       ]),
-                                // ),
-                                // Display comments with user name in bold and comment in normal text
-
-                                /* Delete comment */
-
-                                /* ENDS HERE */
+                                
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: (commentsMap[index] ?? [])
+                                  children: ((followingPostsList[index]['comments'] as List<dynamic>))
                                       .map((commentText) {
                                     return Padding(
                                       padding: EdgeInsets.symmetric(
@@ -1008,7 +507,7 @@ class _HomePageState extends State<HomePage> {
                                                         .style,
                                                     children: [
                                                       TextSpan(
-                                                        text: userData[
+                                                        text: commentText[
                                                             'username'], // Assuming "Profile name" is the user name
                                                         style: TextStyle(
                                                             fontWeight:
@@ -1019,7 +518,7 @@ class _HomePageState extends State<HomePage> {
                                                           text:
                                                               ' '), // Add space between user name and comment
                                                       TextSpan(
-                                                          text: commentText),
+                                                          text: commentText['comment']),
                                                     ],
                                                   ),
                                                 ),
@@ -1028,18 +527,21 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Align(
                                             alignment: Alignment.centerRight,
-                                            child: TextButton(
+                                            child: 
+                                            commentText['uid'] == _auth.currentUser!.uid ?
+                                            TextButton(
                                               onPressed: () {
                                                 // Call a function to delete the comment
-                                                deleteComment(
-                                                    index, commentText);
+                                                if(commentText['uid'] == _auth.currentUser!.uid){
+                                                  removeComments(followingPostsList[index], commentText);
+                                                }
                                               },
                                               child: Text(
                                                 'Delete',
                                                 style: TextStyle(
                                                     color: Colors.red),
                                               ),
-                                            ),
+                                            ) : Text(""),
                                           ),
                                         ],
                                       ),
