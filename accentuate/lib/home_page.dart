@@ -89,37 +89,35 @@ class _HomePageState extends State<HomePage> {
     "images/p9.jpg",
   ];
 
-
   updateLikes(bool isLike, Map<String, dynamic> post) async {
-    try{
-         Map<String, String> obj = {
-         "uid": _auth.currentUser!.uid,
-         "username": currUsername
-         } ;
+    try {
+      Map<String, String> obj = {
+        "uid": _auth.currentUser!.uid,
+        "username": currUsername
+      };
       _write.addOrRemoveLikeFromPost(!isLike, post, obj);
       setState(() {});
-    } catch(e) {
+    } catch (e) {
       print("LIKES ERROR: " + e.toString());
     }
   }
 
-  addComments(Map<String, dynamic> post, Map<String, String> comment){
-    try{
+  addComments(Map<String, dynamic> post, Map<String, String> comment) {
+    try {
       _write.addCommentFromPost(post, comment);
       _commentController.clear();
       setState(() {});
-    } catch (e){
+    } catch (e) {
       print("COMMENTS ERROR" + e.toString());
     }
   }
 
   removeComments(Map<String, dynamic> post, Map<String, dynamic> comment) {
-    try{
+    try {
       _write.removeCommentFromPost(post, comment);
       setState(() {});
-    } catch (e){
+    } catch (e) {
       print("REMOVE COMMENTS ERROR" + e.toString());
-
     }
   }
   /* ENDS HERE */
@@ -160,6 +158,7 @@ class _HomePageState extends State<HomePage> {
     imgUrls = [];
     descriptions = [];
     followingPostsList = [];
+    usersList = [];
 
     // Retrieve the image from Firebase Storage
     getImageUrl();
@@ -170,11 +169,19 @@ class _HomePageState extends State<HomePage> {
   // Method to fetch like counts and comments from Firestore
   void fetchLikeCountsAndComments() async {
     try {
-      List<Map<String, dynamic>> followingPosts2 = await _get.getFollowingPosts();
+      List<Map<String, dynamic>> followingPosts2 =
+          await _get.getFollowingPosts();
       followingPostsList.addAll(followingPosts2);
-      print(followingPostsList);
+      //print(followingPostsList);
 
-      var snaps = await _firestore.collection('users').doc(_auth.currentUser!.uid).get();
+      List<Map<String, dynamic>> userslist2 = await _get.getUsers();
+      usersList.addAll(userslist2);
+      print(usersList);
+
+      var snaps = await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid)
+          .get();
       currUsername = (snaps.data()!['username']);
 
       //print(followingPostsList);
@@ -196,6 +203,8 @@ class _HomePageState extends State<HomePage> {
   late List<String> descriptions;
 
   late List<Map<String, dynamic>> followingPostsList;
+
+  late List<Map<String, dynamic>> usersList;
 
   Future<void> getImageUrl() async {
     setState(() {
@@ -327,7 +336,6 @@ class _HomePageState extends State<HomePage> {
                   },
                   icon: const Icon(Icons.add_circle_outline),
                 ),
-
               ],
             ),
             body: RefreshIndicator(
@@ -367,18 +375,20 @@ class _HomePageState extends State<HomePage> {
                                 //userData['username'],
                               ),
                               Spacer(),
-
                             ],
                           ),
                           ImageGridDisplay(
-                              imageUrls: followingPostsList[index]['postUrl'] as List<dynamic>,
+                              imageUrls: followingPostsList[index]['postUrl']
+                                  as List<dynamic>,
                               onImageClicked: (int i) => {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => ImageListPage(
-                                          imageUrls: followingPostsList[index]['postUrl'],
-                                          description: followingPostsList[index]['description'],
+                                          imageUrls: followingPostsList[index]
+                                              ['postUrl'],
+                                          description: followingPostsList[index]
+                                              ['description'],
                                         ),
                                       ),
                                     ),
@@ -388,8 +398,10 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => ImageListPage(
-                                          imageUrls: followingPostsList[index]['postUrl'],
-                                          description: followingPostsList[index]['description'],
+                                          imageUrls: followingPostsList[index]
+                                              ['postUrl'],
+                                          description: followingPostsList[index]
+                                              ['description'],
                                         ),
                                       ),
                                     ),
@@ -400,15 +412,35 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               IconButton(
                                 onPressed: () {
-                                  print((followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid));
-                                  updateLikes((followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid), followingPostsList[index]);
+                                  print((followingPostsList[index]['likes']
+                                          as List<dynamic>)
+                                      .any((item) =>
+                                          item['uid'] ==
+                                          _auth.currentUser!.uid));
+                                  updateLikes(
+                                      (followingPostsList[index]['likes']
+                                              as List<dynamic>)
+                                          .any((item) =>
+                                              item['uid'] ==
+                                              _auth.currentUser!.uid),
+                                      followingPostsList[index]);
                                 },
                                 icon: Icon(
-                                  (followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid)
+                                  (followingPostsList[index]['likes']
+                                              as List<dynamic>)
+                                          .any((item) =>
+                                              item['uid'] ==
+                                              _auth.currentUser!.uid)
                                       ? Icons.favorite
                                       : Icons.favorite_border,
                                   // Update the color based on the isLiked state
-                                  color: (followingPostsList[index]['likes'] as List<dynamic>).any((item) => item['uid'] == _auth.currentUser!.uid) ? Colors.red : null,
+                                  color: (followingPostsList[index]['likes']
+                                              as List<dynamic>)
+                                          .any((item) =>
+                                              item['uid'] ==
+                                              _auth.currentUser!.uid)
+                                      ? Colors.red
+                                      : null,
                                 ),
                               ),
                               IconButton(
@@ -435,19 +467,24 @@ class _HomePageState extends State<HomePage> {
                                           TextButton(
                                             onPressed: () {
                                               // Handle adding a comment
-                                              String comm = _commentController.text;
+                                              String comm =
+                                                  _commentController.text;
                                               print(comm);
-                                              if(comm.isNull || comm.isEmpty){
-                                                const snackbar = SnackBar(content: Text("Please leave a comment before adding."));
-                                                ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                                              }
-                                              else{
-                                              Map<String, String> obj = {
+                                              if (comm.isNull || comm.isEmpty) {
+                                                const snackbar = SnackBar(
+                                                    content: Text(
+                                                        "Please leave a comment before adding."));
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(snackbar);
+                                              } else {
+                                                Map<String, String> obj = {
                                                   "comment": comm,
                                                   "uid": _auth.currentUser!.uid,
                                                   "username": currUsername
-                                                } ;
-                                                addComments(followingPostsList[index], obj);
+                                                };
+                                                addComments(
+                                                    followingPostsList[index],
+                                                    obj);
                                                 Navigator.of(context).pop();
                                               }
                                             },
@@ -474,19 +511,41 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         TextSpan(text: "Liked by"),
                                         TextSpan(
-                                          text: (followingPostsList[index]['likes'] as List).length == 0
+                                          text: (followingPostsList[index]
+                                                          ['likes'] as List)
+                                                      .length ==
+                                                  0
                                               ? " no one."
-                                              : (followingPostsList[index]['likes'] as List).length == 1
-
-                                              ? " ${followingPostsList[index]['likes'][0]['username']}" :" ${followingPostsList[index]['likes'][0]['username']}" + " and " + "${(followingPostsList[index]['likes'] as List).length - 1}" + " other(s)",
-                                          
-                                )
-                                ]),
+                                              : (followingPostsList[index]
+                                                              ['likes'] as List)
+                                                          .length ==
+                                                      1
+                                                  ? " ${followingPostsList[index]['likes'][0]['username']}"
+                                                  : " ${followingPostsList[index]['likes'][0]['username']}" +
+                                                      " and " +
+                                                      "${(followingPostsList[index]['likes'] as List).length - 1}" +
+                                                      " other(s)",
+                                        )
+                                      ]),
                                 ),
-                                
+                                RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(text: "\n"),
+                                        TextSpan(
+                                          text: userUrls[index],
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        TextSpan(
+                                            text: " " + descriptions[index])
+                                      ]),
+                                ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: ((followingPostsList[index]['comments'] as List<dynamic>))
+                                  children: ((followingPostsList[index]
+                                          ['comments'] as List<dynamic>))
                                       .map((commentText) {
                                     return Padding(
                                       padding: EdgeInsets.symmetric(
@@ -518,7 +577,8 @@ class _HomePageState extends State<HomePage> {
                                                           text:
                                                               ' '), // Add space between user name and comment
                                                       TextSpan(
-                                                          text: commentText['comment']),
+                                                          text: commentText[
+                                                              'comment']),
                                                     ],
                                                   ),
                                                 ),
@@ -527,21 +587,27 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Align(
                                             alignment: Alignment.centerRight,
-                                            child: 
-                                            commentText['uid'] == _auth.currentUser!.uid ?
-                                            TextButton(
-                                              onPressed: () {
-                                                // Call a function to delete the comment
-                                                if(commentText['uid'] == _auth.currentUser!.uid){
-                                                  removeComments(followingPostsList[index], commentText);
-                                                }
-                                              },
-                                              child: Text(
-                                                'Delete',
-                                                style: TextStyle(
-                                                    color: Colors.red),
-                                              ),
-                                            ) : Text(""),
+                                            child: commentText['uid'] ==
+                                                    _auth.currentUser!.uid
+                                                ? TextButton(
+                                                    onPressed: () {
+                                                      // Call a function to delete the comment
+                                                      if (commentText['uid'] ==
+                                                          _auth.currentUser!
+                                                              .uid) {
+                                                        removeComments(
+                                                            followingPostsList[
+                                                                index],
+                                                            commentText);
+                                                      }
+                                                    },
+                                                    child: Text(
+                                                      'Delete',
+                                                      style: TextStyle(
+                                                          color: Colors.red),
+                                                    ),
+                                                  )
+                                                : Text(""),
                                           ),
                                         ],
                                       ),
